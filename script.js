@@ -45,10 +45,25 @@ document.querySelectorAll('.project-card, .skill-card, .section-title, .educatio
     observer.observe(el);
 });
 
-// Mobile menu toggle (if needed in future)
-function toggleMobileMenu() {
-    const nav = document.querySelector('nav ul');
-    nav.classList.toggle('mobile-active');
+// Mobile menu toggle
+const mobileMenu = document.querySelector('#mobile-menu');
+const navMenu = document.querySelector('.nav-menu');
+
+if (mobileMenu && navMenu) {
+    mobileMenu.addEventListener('click', () => {
+        mobileMenu.classList.toggle('is-active');
+        navMenu.classList.toggle('active');
+        document.body.classList.toggle('menu-open');
+    });
+
+    // Close menu when clicking a link
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.remove('is-active');
+            navMenu.classList.remove('active');
+            document.body.classList.remove('menu-open');
+        });
+    });
 }
 
 // Add loading animation
