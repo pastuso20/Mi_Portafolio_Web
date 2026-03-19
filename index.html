@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>David Felipe Aite Trejo - Portafolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Animated background elements -->
-    <div class="bg-element"></div>
-    <div class="bg-element"></div>
+    <!-- Neural Network Background — Full Page -->
+    <canvas id="circuit-canvas"></canvas>
 
     <!-- Header -->
-    <header>
+    <header class="premium-header">
         <div class="container nav-container">
             <div class="logo">David Felipe Aite Trejo</div>
             <div class="menu-toggle" id="mobile-menu">
@@ -32,29 +34,24 @@
     </header>
 
     <!-- Hero Section -->
-    <section id="inicio" class="hero">
-        <div class="coming-soon">DISPONIBLE</div>
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <h1>David Felipe<br>Aite Trejo</h1>
-                    <p class="subtitle">Ingeniero en sistemas | Desarrollador web</p>
-                    <p class="location">📍 Cartagena, Colombia</p>
-                    <a href="#experiencia" class="cta-button">Ver Experiencia</a>
+    <section id="inicio" class="hero-premium">
+
+        <div class="container hero-container">
+            <div class="hero-left">
+                <div class="hero-category">SISTEMAS & DESARROLLO FULL-STACK</div>
+                <h1 class="hero-name">David Felipe<br>Aite Trejo</h1>
+                <p class="hero-description">Transformando visión en realidad técnica con diseño de alto impacto y arquitectura de software de elite.</p>
+                <div class="hero-actions">
+                    <a href="#experiencia" class="premium-cta">Ver Experiencia <span class="glow-edge"></span></a>
                 </div>
-                <div class="hero-profile">
-                    <div class="profile-container">
-                        <div class="profile-image-wrapper">
-                            <img src="portada.jpeg" alt="David Felipe Aite Trejo" class="profile-image" id="profileImage">
-                        </div>  
-                        <div class="profile-overlay">
-                            <div class="profile-tech-icons">
-                                <span class="tech-icon">💻</span>
-                                <span class="tech-icon">🌐</span>
-                                <span class="tech-icon">🤖</span>
-                                <span class="tech-icon">⚡</span>
-                            </div>
-                        </div>
+            </div>
+            <div class="hero-right">
+                <div class="hero-asset">
+                    <div class="orbit-ring orbit-ring-1"></div>
+                    <div class="orbit-ring orbit-ring-2"></div>
+                    <div class="orbit-ring orbit-ring-3"></div>
+                    <div class="portrait-wrapper">
+                        <img src="portada.jpeg" alt="David Felipe Aite Trejo" class="premium-portrait" id="profileImage">
                     </div>
                 </div>
             </div>
@@ -62,38 +59,41 @@
     </section>
 
     <!-- About Section -->
-    <section id="sobre-mi" class="about">
+    <section id="sobre-mi" class="premium-section">
         <div class="container">
-            <h2 class="section-title">Perfil Profesional</h2>
+            <span class="section-label scroll-reveal">Sobre Mí</span>
+            <h2 class="section-title scroll-reveal">Perfil Profesional</h2>
             <div class="about-content">
-                <div>
-                    <h3 style="font-size: 2rem; margin-bottom: 20px; color: #00ff88;">¿Quién soy?</h3>
-                    <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 30px;">
-Soy un profesional altamente motivado y con una sólida formación técnica, comprometido con la excelencia en el diseño, desarrollo y gestión de soluciones tecnológicas. Desarrolló habilidades en diversas áreas de la ingeniería de sistemas, enfocándome en la creación de ideas nuevas que satisfagan las necesidades del negocio.                    </p>
-                    <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 30px;">
+                <div class="about-text-wrapper scroll-reveal">
+                    <h3 class="premium-subtitle">¿Quién soy?</h3>
+                    <p class="premium-text">
+                        Soy un profesional altamente motivado y con una sólida formación técnica, comprometido con la excelencia en el diseño, desarrollo y gestión de soluciones tecnológicas. Desarrolló habilidades en diversas áreas de la ingeniería de sistemas, enfocándome en la creación de ideas nuevas que satisfagan las necesidades del negocio.
+                    </p>
+                    <p class="premium-text">
                         Poseo habilidades en comunicación, adaptabilidad y responsabilidad. 
                         Actualmente enfocado en tecnologías relacionadas con inteligencia artificial.
                     </p>
                     
                     <div class="education-section">
-                        <h4 style="color: #00ff88; font-size: 1.5rem; margin-bottom: 20px;">Formación Académica</h4>
-                        <div class="education-item">
-                            <h5 style="color: white; font-size: 1.2rem; margin-bottom: 10px;">Ingeniero en Sistemas</h5>
-                            <p style="opacity: 0.8; margin-bottom: 15px;">Corporación Universitaria Rafael Núñez | 2023 - 2025</p>
+                        <h4 class="premium-subtitle-small">Formación Académica</h4>
+                        <div class="education-item crystal-card">
+                            <h5 class="education-title">Ingeniero en Sistemas</h5>
+                            <p class="education-period">Corporación Universitaria Rafael Núñez | 2023 - 2025</p>
                         </div>
-                        <div class="education-item">
-                            <h5 style="color: white; font-size: 1.2rem; margin-bottom: 10px;">Diplomado de Inteligencia de Negocios</h5>
-                            <p style="opacity: 0.8; margin-bottom: 15px;">Corporación Universitaria Rafael Núñez | 2025</p>
+                        <div class="education-item crystal-card">
+                            <h5 class="education-title">Diplomado de Inteligencia de Negocios</h5>
+                            <p class="education-period">Corporación Universitaria Rafael Núñez | 2025</p>
                         </div>
-                        <div class="education-item">
-                            <h5 style="color: white; font-size: 1.2rem; margin-bottom: 10px;">Tecnólogo en Desarrollo de Software y Sistemas de Información</h5>
-                            <p style="opacity: 0.8; margin-bottom: 5px;">Corporación Universitaria Rafael Núñez | 2021 - 2023</p>
-                            <p style="opacity: 0.7; font-style: italic;">Proyecto final: Sistema de gestión escolar</p>
+                        <div class="education-item crystal-card">
+                            <h5 class="education-title">Tecnólogo en Desarrollo de Software y Sistemas de Información</h5>
+                            <p class="education-period">Corporación Universitaria Rafael Núñez | 2021 - 2023</p>
+                            <p class="education-desc">Proyecto final: Sistema de gestión escolar</p>
                         </div>
                     </div>
                 </div>
-                      <div class="skills-section">
-                    <h4 style="color: #00ff88; font-size: 1.5rem; margin-bottom: 30px; text-align: center;">Competencias Técnicas</h4>
+                
+                <div class="skills-section scroll-reveal delay-1">
+                    <h4 class="premium-subtitle-small text-center">Competencias Técnicas</h4>
                     
                     <div class="skills-visualization">
                         <div class="skill-item">
@@ -158,7 +158,7 @@ Soy un profesional altamente motivado y con una sólida formación técnica, com
                     </div>
                     
                     <div class="soft-skills">
-                        <h4 style="color: #00ff88; font-size: 1.2rem; margin: 40px 0 20px 0; text-align: center;">Habilidades Blandas</h4>
+                        <h4 class="premium-subtitle-small text-center mt-4">Habilidades Blandas</h4>
                         <div class="soft-skills-grid">
                             <div class="soft-skill-tag">Comunicación</div>
                             <div class="soft-skill-tag">Adaptabilidad</div>
@@ -172,45 +172,55 @@ Soy un profesional altamente motivado y con una sólida formación técnica, com
             </div>
         </div>
     </section>
+
     <!-- Experience Section -->
-    <section id="experiencia" class="projects">
+    <section id="experiencia" class="premium-section">
         <div class="container">
-            <h2 class="section-title">Experiencia Laboral</h2>
+            <span class="section-label scroll-reveal">Trayectoria</span>
+            <h2 class="section-title scroll-reveal">Experiencia Laboral</h2>
             <div class="projects-grid">
-                <div class="project-card">
-                    <div class="project-image">🖥️</div>
+                <div class="project-card crystal-card scroll-reveal">
+                    <div class="project-image-premium">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    </div>
                     <div class="project-info">
                         <h3>Asistente de Sistemas</h3>
                         <p class="company">Grupo BSA | Cartagena</p>
                         <p class="period">Febrero 2022 - Abril 2023</p>
-                        <p>Encargado del soporte técnico, mantenimiento de equipos, gestión de redes y atención a necesidades tecnológicas de la empresa.</p>
+                        <p class="premium-text small">Encargado del soporte técnico, mantenimiento de equipos, gestión de redes y atención a necesidades tecnológicas de la empresa.</p>
                     </div>
                 </div>
-                <div class="project-card">
-                    <div class="project-image">🌐</div>
+                <div class="project-card crystal-card scroll-reveal delay-1">
+                    <div class="project-image-premium">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    </div>
                     <div class="project-info">
                         <h3>Desarrollador Web</h3>
                         <p class="company">Refrigeración H y T | Cartagena</p>
                         <p class="period">Enero 2021 - Enero 2022</p>
-                        <p>Desarrollo y despliegue de un catálogo de productos web con tecnologías HTML, CSS y JavaScript.</p>
+                        <p class="premium-text small">Desarrollo y despliegue de un catálogo de productos web con tecnologías HTML, CSS y JavaScript.</p>
                     </div>
                 </div>
-                <div class="project-card">
-                    <div class="project-image">🚗</div>
+                <div class="project-card crystal-card scroll-reveal delay-2">
+                    <div class="project-image-premium">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+                    </div>
                     <div class="project-info">
                         <h3>Publicidad y Ventas</h3>
                         <p class="company">Chevrolet | Cartagena</p>
                         <p class="period">Julio 2020 - Agosto 2021</p>
-                        <p>Estrategias de marketing, promoción de vehículos y atención al cliente en área comercial.</p>
+                        <p class="premium-text small">Estrategias de marketing, promoción de vehículos y atención al cliente en área comercial.</p>
                     </div>
                 </div>
-                <div class="project-card">
-                    <div class="project-image">📢</div>
+                <div class="project-card crystal-card scroll-reveal delay-3">
+                    <div class="project-image-premium">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    </div>
                     <div class="project-info">
                         <h3>Publicidad y Ventas</h3>
                         <p class="company">MCA | Cartagena</p>
                         <p class="period">Marzo 2019 - Mayo 2020</p>
-                        <p>Creación de contenido publicitario y trabajo en ventas directas al consumidor.</p>
+                        <p class="premium-text small">Creación de contenido publicitario y trabajo en ventas directas al consumidor.</p>
                     </div>
                 </div>
             </div>
@@ -218,25 +228,30 @@ Soy un profesional altamente motivado y con una sólida formación técnica, com
     </section>
 
     <!-- Contact Section -->
-    <section id="contacto" class="contact">
+    <section id="contacto" class="contact premium-section">
         <div class="container">
-            <h2 class="section-title">Contacto</h2>
-            <div class="contact-content">
-                <p style="font-size: 1.2rem; margin-bottom: 30px;">
-                    ¿Tienes un proyecto en mente? ¡Hablemos y hagámoslo realidad!
-                </p>
-                <p style="font-size: 1rem; opacity: 0.8; margin-bottom: 40px;">
-                    Estoy disponible para proyectos freelance, colaboraciones y oportunidades de trabajo remoto.
+            <span class="section-label scroll-reveal">Hablemos</span>
+            <h2 class="section-title scroll-reveal">Contacto</h2>
+            <div class="contact-content crystal-card scroll-reveal delay-1">
+                <h3 class="premium-subtitle text-center">¿Tienes un proyecto en mente?</h3>
+                <p class="premium-text text-center" style="margin-bottom: 30px;">
+                    Hablemos y hagámoslo realidad. Estoy disponible para proyectos freelance, colaboraciones y oportunidades de trabajo remoto.
                 </p>
                 <div class="contact-info">
-                    <span>📞 3243684575</span>
-                    <span>✉️ davidfelipeaitetrejo@gmail.com</span>
+                    <div class="contact-item">
+                        <span class="icon">📞</span>
+                        <span>+57 324 368 4575</span>
+                    </div>
+                    <div class="contact-item">
+                        <span class="icon">✉️</span>
+                        <span>davidfelipeaitetrejo@gmail.com</span>
+                    </div>
                 </div>
                 <div class="contact-links">
-                    <a href="mailto:davidfelipeaitetrejo@gmail.com" class="contact-link">📧 Email</a>
-                    <a href="tel:+573243684575" class="contact-link">📱 WhatsApp</a>
-                    <a href="#" class="contact-link">💼 LinkedIn</a>
-                    <a href="#" class="contact-link">💻 GitHub</a>
+                    <a href="mailto:davidfelipeaitetrejo@gmail.com" class="premium-cta small-cta">Email <span class="glow-edge"></span></a>
+                    <a href="tel:+573243684575" class="premium-cta small-cta">WhatsApp <span class="glow-edge"></span></a>
+                    <a href="#" class="premium-cta small-cta">LinkedIn <span class="glow-edge"></span></a>
+                    <a href="#" class="premium-cta small-cta">GitHub <span class="glow-edge"></span></a>
                 </div>
             </div>
         </div>
@@ -245,10 +260,243 @@ Soy un profesional altamente motivado y con una sólida formación técnica, com
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p>&copy; 2025 David Felipe Aite Trejo. Todos los derechos reservados.</p>
+            <p>&copy; 2025 <span>David Felipe Aite Trejo</span>. Todos los derechos reservados.</p>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=2"></script>
+    <script>
+    /* SYNAPTIC OVERRIDE — Runs AFTER script.js, replaces the canvas animation */
+    (function initNeural() {
+        const canvas = document.getElementById('circuit-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        let W, H, TX, TY, nodes = [], edges = [], parts = [], raf;
+
+        const rnd  = (a, b) => a + Math.random() * (b - a);
+        const d2   = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+        const clp  = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+        function resize() {
+            W = canvas.width  = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+            locateTarget();
+            buildNet();
+        }
+
+        function locateTarget() {
+            const img = document.getElementById('profileImage');
+            if (!img) { TX = W * .75; TY = H * .45; return; }
+            const ir = img.getBoundingClientRect();
+            TX = ir.left + ir.width  * .5;
+            TY = ir.top  + ir.height * .36;
+        }
+
+        function buildNet() {
+            nodes = []; edges = []; parts = [];
+
+            /* Hub positions — index 0 = profile image */
+            const hubs = [{ x: TX, y: TY }];
+            for (let i = 1; i < 18; i++)
+                hubs.push({ x: rnd(W*.04,W*.96), y: rnd(H*.03,H*.97) });
+
+            hubs.forEach((h, i) => nodes.push({
+                x: h.x, y: h.y,
+                r:        i===0 ? rnd(18,24) : rnd(8,16),
+                glowR:    i===0 ? 65          : rnd(22,48),
+                ph:       rnd(0, Math.PI*2),
+                phS:      rnd(.012,.032),
+                ring:     i===0 || Math.random()<.45,
+                ringR:    rnd(18,34),
+                ringA:    rnd(.28,.65),
+                tgt:      i===0,
+                dep:      rnd(.55,1),
+            }));
+
+            hubs.forEach((h, hi) => {
+                const cnt = hi===0 ? 7 : (rnd(2,5)|0);
+                for (let s=0;s<cnt;s++) {
+                    const ang = rnd(0,Math.PI*2), r = rnd(55,215);
+                    nodes.push({ x:clp(h.x+Math.cos(ang)*r,5,W-5), y:clp(h.y+Math.sin(ang)*r,5,H-5),
+                        r:rnd(2.5,6.5), glowR:rnd(8,20), ph:rnd(0,Math.PI*2), phS:rnd(.01,.024),
+                        ring:false, tgt:false, dep:rnd(.3,.78) });
+                }
+            });
+
+            nodes.forEach((n,i) => {
+                const k = n.r>8?4:2;
+                nodes.map((m,j)=>({j,d:d2(n,m)}))
+                    .filter(e=>e.j!==i&&e.d<W*.44&&e.d>18)
+                    .sort((a,b)=>a.d-b.d).slice(0,k)
+                    .forEach(({j})=>{
+                        const key=[Math.min(i,j),Math.max(i,j)].join('-');
+                        if (edges.find(e=>e.key===key)) return;
+                        const na=nodes[i],nb=nodes[j],dx=nb.x-na.x,dy=nb.y-na.y;
+                        const b=rnd(.18,.52)*(Math.random()<.5?1:-1), px=-dy*b, py=dx*b;
+                        edges.push({ key,a:i,b:j,
+                            c1x:na.x+dx*.3+px*.5,c1y:na.y+dy*.3+py*.5,
+                            c2x:na.x+dx*.7+px*.5,c2y:na.y+dy*.7+py*.5,
+                            al:rnd(.06,.24), lw:rnd(.5,1.6) });
+                    });
+            });
+
+            for (let k=0;k<85;k++) spawnP(0);
+        }
+
+        function bezPt(e,t) {
+            const na=nodes[e.a],nb=nodes[e.b],m=1-t;
+            return { x:m*m*m*na.x+3*m*m*t*e.c1x+3*m*t*t*e.c2x+t*t*t*nb.x,
+                     y:m*m*m*na.y+3*m*m*t*e.c1y+3*m*t*t*e.c2y+t*t*t*nb.y };
+        }
+
+        function pathTo(si, ti) {
+            const vis=new Set(), path=[{ni:si,ei:-1,rv:false}]; let cur=si;
+            for (let s=0;s<90;s++) {
+                if (cur===ti) break; vis.add(cur);
+                const lnk=edges.map((e,ei)=>{
+                    if(e.a===cur) return {nn:e.b,ei,rv:false};
+                    if(e.b===cur) return {nn:e.a,ei,rv:true};
+                    return null;
+                }).filter(l=>l&&!vis.has(l.nn));
+                if (!lnk.length) break;
+                lnk.sort((a,b)=>d2(nodes[a.nn],nodes[ti])-d2(nodes[b.nn],nodes[ti]));
+                const best=lnk[0];
+                path.push({ni:best.nn,ei:best.ei,rv:best.rv}); cur=best.nn;
+            }
+            return path;
+        }
+
+        function spawnP(ti) {
+            const far=nodes.map((n,i)=>({i,d:d2(n,nodes[ti])}))
+                .filter(e=>e.i!==ti).sort((a,b)=>b.d-a.d);
+            if(!far.length) return;
+            const si=far[Math.floor(rnd(0,Math.min(14,far.length)))|0].i;
+            const path=pathTo(si,ti);
+            if(path.length<2) return;
+            parts.push({ path, seg:0, t:rnd(0,1), spd:rnd(.003,.009),
+                         sz:rnd(2,4.2), al:rnd(.72,1), tr:[] });
+        }
+
+        function drawFrame(ts) {
+            ctx.clearRect(0,0,W,H);
+
+            /* Background — full page deep blue */
+            const bg=ctx.createLinearGradient(0,0,W*.7,H);
+            bg.addColorStop(0,  '#010d1c');
+            bg.addColorStop(.5, '#020f24');
+            bg.addColorStop(1,  '#011020');
+            ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+            /* Ambient blobs spread across full page */
+            [
+                [W*.15, H*.12, 320, .12],
+                [W*.75, H*.22, 260, .10],
+                [W*.05, H*.45, 200, .09],
+                [W*.60, H*.55, 280, .11],
+                [W*.30, H*.70, 210, .08],
+                [W*.85, H*.80, 240, .09],
+                [W*.45, H*.35, 300, .07],
+            ].forEach(([cx,cy,r,a])=>{
+                const g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+                g.addColorStop(0,`rgba(0,80,200,${a})`); g.addColorStop(1,'transparent');
+                ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+                ctx.fillStyle=g; ctx.fill();
+            });
+
+            /* Edges — organic bezier curves */
+            edges.forEach(e=>{
+                const avgD=(nodes[e.a].dep+nodes[e.b].dep)*.5, lw=e.lw*avgD;
+                ctx.beginPath();
+                ctx.moveTo(nodes[e.a].x,nodes[e.a].y);
+                ctx.bezierCurveTo(e.c1x,e.c1y,e.c2x,e.c2y,nodes[e.b].x,nodes[e.b].y);
+                ctx.strokeStyle=`rgba(0,175,255,${e.al*.38*avgD})`; ctx.lineWidth=lw+5; ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(nodes[e.a].x,nodes[e.a].y);
+                ctx.bezierCurveTo(e.c1x,e.c1y,e.c2x,e.c2y,nodes[e.b].x,nodes[e.b].y);
+                ctx.strokeStyle=`rgba(0,215,255,${e.al*avgD})`; ctx.lineWidth=lw; ctx.stroke();
+            });
+
+            /* Nodes — glowing spheres with orbital rings */
+            nodes.forEach(n=>{
+                n.ph+=n.phS;
+                const p=.78+.22*Math.sin(n.ph), a=n.dep;
+                const oR=n.glowR*2.5*p;
+                const aura=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,oR);
+                aura.addColorStop(0,`rgba(0,190,255,${.30*a})`);
+                aura.addColorStop(.42,`rgba(0,120,255,${.13*a})`);
+                aura.addColorStop(1,'transparent');
+                ctx.beginPath(); ctx.arc(n.x,n.y,oR,0,Math.PI*2);
+                ctx.fillStyle=aura; ctx.fill();
+
+                const iR=n.r*1.85;
+                const inner=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,iR);
+                inner.addColorStop(0,`rgba(210,248,255,${.96*a})`);
+                inner.addColorStop(.4,`rgba(0,210,255,${.72*a})`);
+                inner.addColorStop(1,`rgba(0,100,255,${.10*a})`);
+                ctx.beginPath(); ctx.arc(n.x,n.y,iR,0,Math.PI*2);
+                ctx.fillStyle=inner; ctx.fill();
+
+                ctx.beginPath(); ctx.arc(n.x,n.y,n.r*.52,0,Math.PI*2);
+                ctx.fillStyle=`rgba(225,252,255,${.97*a})`; ctx.fill();
+
+                if (n.ring) {
+                    const rr=n.ringR*(.9+.1*Math.sin(n.ph*.6));
+                    ctx.setLineDash(n.tgt?[8,5]:[5,9]);
+                    ctx.beginPath(); ctx.arc(n.x,n.y,rr,0,Math.PI*2);
+                    ctx.strokeStyle=`rgba(0,210,255,${n.ringA*a*p})`;
+                    ctx.lineWidth=n.tgt?1.3:.9; ctx.stroke();
+                    ctx.setLineDash([]);
+                    if (n.tgt) {
+                        ctx.setLineDash([4,11]);
+                        ctx.beginPath(); ctx.arc(n.x,n.y,rr*1.68*(1+.05*Math.sin(n.ph*.4)),0,Math.PI*2);
+                        ctx.strokeStyle=`rgba(0,165,255,${.34*a*p})`;
+                        ctx.lineWidth=.75; ctx.stroke(); ctx.setLineDash([]);
+                    }
+                }
+            });
+
+            /* Particles — travel along bezier curves toward profile image */
+            for (let k=parts.length-1;k>=0;k--) {
+                const p=parts[k];
+                p.t+=p.spd;
+                if (p.t>=1) {
+                    p.t-=1; p.seg++;
+                    if (p.seg>=p.path.length-1) { parts.splice(k,1); spawnP(0); continue; }
+                }
+                const seg=p.path[p.seg], e=edges[seg.ei];
+                if (!e) { parts.splice(k,1); spawnP(0); continue; }
+                const t=seg.rv?1-p.t:p.t, pt=bezPt(e,t);
+
+                p.tr.unshift({x:pt.x,y:pt.y});
+                if(p.tr.length>22) p.tr.pop();
+                p.tr.forEach((tp,ti)=>{
+                    const f=1-ti/p.tr.length;
+                    ctx.beginPath(); ctx.arc(tp.x,tp.y,p.sz*f*.8,0,Math.PI*2);
+                    ctx.fillStyle=`rgba(0,225,255,${p.al*f*.5})`; ctx.fill();
+                });
+
+                const hg=ctx.createRadialGradient(pt.x,pt.y,0,pt.x,pt.y,p.sz*8);
+                hg.addColorStop(0,`rgba(130,235,255,${p.al*.88})`);
+                hg.addColorStop(.42,`rgba(0,190,255,${p.al*.38})`);
+                hg.addColorStop(1,'transparent');
+                ctx.beginPath(); ctx.arc(pt.x,pt.y,p.sz*8,0,Math.PI*2);
+                ctx.fillStyle=hg; ctx.fill();
+
+                ctx.beginPath(); ctx.arc(pt.x,pt.y,p.sz*.88,0,Math.PI*2);
+                ctx.fillStyle='#e8f9ff'; ctx.fill();
+            }
+        }
+
+        function loop(ts) { drawFrame(ts||0); raf=requestAnimationFrame(loop); }
+
+        let rt;
+        window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(()=>{ cancelAnimationFrame(raf); resize(); loop(0); },150); });
+
+        function start() { resize(); loop(0); }
+        if (document.readyState==='complete') start();
+        else window.addEventListener('load', start);
+    })();
+    </script>
 </body>
 </html>
