@@ -208,10 +208,14 @@ export default function NeuralBackground({ scrollProgress }: { scrollProgress: a
         <ambientLight intensity={0.15} /> 
         <pointLight position={[15, 15, 15]} intensity={1.2} color={ELECTRIC_BLUE} /> 
         <Particles scrollProgress={scrollProgress} /> 
-        <EffectComposer disableNormalPass> 
+        <EffectComposer enableNormalPass={false}> 
           <Bloom luminanceThreshold={0.1} luminanceSmoothing={0.8} intensity={1.8} blendFunction={BlendFunction.ADD} /> 
           <Noise opacity={0.04} />
-          <ChromaticAberration offset={new THREE.Vector2(0.0008, 0.0008)} />
+          <ChromaticAberration 
+            offset={new THREE.Vector2(0.0008, 0.0008)} 
+            radialModulation={false}
+            modulationOffset={0}
+          />
           <Vignette eskil={false} offset={0.1} darkness={1.1} />
         </EffectComposer> 
       </Canvas> 
