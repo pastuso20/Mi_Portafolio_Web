@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react'; 
+import React, { useRef, useMemo, useState, useEffect } from 'react'; 
 import { Canvas, useFrame, useThree } from '@react-three/fiber'; 
 import * as THREE from 'three'; 
 import { EffectComposer, Bloom, Noise, ChromaticAberration, Vignette } from '@react-three/postprocessing'; 
@@ -8,34 +8,37 @@ const MAX_PARTICLES = 1000;
 const MAX_CONNECTIONS = 6; 
 const MAX_LINES = MAX_PARTICLES * MAX_CONNECTIONS; 
 
-// Colors
 const ELECTRIC_BLUE = new THREE.Color('#00C6FF'); 
 const WINE_RED = new THREE.Color('#722F37'); 
 const BACKGROUND_COLOR = '#050505';
 
-function Particles({ scrollProgress }: { scrollProgress: any }) { 
+function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile: boolean }) { 
   const meshRef = useRef<THREE.InstancedMesh>(null); 
   const linesRef = useRef<THREE.LineSegments>(null); 
   const { mouse, viewport } = useThree();
   
   const dummy = useMemo(() => new THREE.Object3D(), []); 
   
+  // Optimize particle count based on device
+  const actualMaxParticles = isMobile ? 400 : 800;
+  const actualMaxConnections = isMobile ? 3 : 5;
+
   const particles = useMemo(() => { 
-    const pos = new Float32Array(MAX_PARTICLES * 3); 
-    const vel = new Float32Array(MAX_PARTICLES * 3); 
-    const seeds = new Float32Array(MAX_PARTICLES);
+    const pos = new Float32Array(actualMaxParticles * 3); 
+    const vel = new Float32Array(actualMaxParticles * 3); 
+    const seeds = new Float32Array(actualMaxParticles);
     
-    // Clustering logic: Create clusters like in the image
-    const clusterCount = 12;
+    // Clustering logic
+    const clusterCount = isMobile ? 8 : 15;
     const clusters = [];
     for (let i = 0; i < clusterCount; i++) {
       clusters.push({
         center: new THREE.Vector3((Math.random() - 0.5) * 25, (Math.random() - 0.5) * 20, (Math.random() - 0.5) * 10),
-        strength: Math.random() * 5 + 2
+        strength: Math.random() * 4 + 2
       });
     }
 
-    for (let i = 0; i < MAX_PARTICLES; i++) { 
+    for (let i = 0; i < actualMaxParticles; i++) { 
       const cluster = clusters[i % clusterCount];
       const spread = cluster.strength;
       
@@ -43,16 +46,16 @@ function Particles({ scrollProgress }: { scrollProgress: any }) {
       pos[i * 3 + 1] = cluster.center.y + (Math.random() - 0.5) * spread; 
       pos[i * 3 + 2] = cluster.center.z + (Math.random() - 0.5) * spread; 
       
-      vel[i * 3] = (Math.random() - 0.5) * 0.003; 
-      vel[i * 3 + 1] = (Math.random() - 0.5) * 0.003; 
-      vel[i * 3 + 2] = (Math.random() - 0.5) * 0.003; 
+      vel[i * 3] = (Math.random() - 0.5) * 0.002; 
+      vel[i * 3 + 1] = (Math.random() - 0.5) * 0.002; 
+      vel[i * 3 + 2] = (Math.random() - 0.5) * 0.002; 
       seeds[i] = Math.random() * 1000;
     } 
     return { pos, vel, seeds }; 
-  }, []); 
+  }, [actualMaxParticles, isMobile]); 
 
-  const linePositions = useMemo(() => new Float32Array(MAX_LINES * 2 * 3), []); 
-  const lineColors = useMemo(() => new Float32Array(MAX_LINES * 2 * 3), []); 
+  const linePositions = useMemo(() => new Float32Array(actualMaxParticles * actualMaxConnections * 2 * 3), [actualMaxParticles]); 
+  const lineColors = useMemo(() => new Float32Array(actualMaxParticles * actualMaxConnections * 2 * 3), [actualMaxParticles]); 
 
   useFrame((state) => { 
     if (!meshRef.current || !linesRef.current) return; 
@@ -60,18 +63,13 @@ function Particles({ scrollProgress }: { scrollProgress: any }) {
     const time = state.clock.getElapsedTime();
     const progress = scrollProgress.get(); 
     
-    // Phase mapping
-    const densityFactor = progress < 0.25 
-      ? THREE.MathUtils.lerp(0.08, 0.25, progress * 4)
-      : progress < 0.5 
-        ? THREE.MathUtils.lerp(0.25, 0.7, (progress - 0.25) * 4)
-        : THREE.MathUtils.lerp(0.7, 1.0, (progress - 0.5) * 2);
+    // Smooth density transition
+    const densityFactor = THREE.MathUtils.lerp(0.15, 1.0, progress);
+    const colorTransition = Math.max(0, (progress - 0.5) * 2);
+    const currentColor = ELECTRIC_BLUE.clone().lerp(WINE_RED, colorTransition);
 
-    const colorTransition = progress < 0.6 ? 0 : (progress - 0.6) * 2.5;
-    const currentColor = ELECTRIC_BLUE.clone().lerp(WINE_RED, Math.min(1, colorTransition));
-
-    const currentParticles = Math.floor(MAX_PARTICLES * densityFactor); 
-    const connectionDist = THREE.MathUtils.lerp(2.5, 4.5, progress);
+    const currentParticles = Math.floor(actualMaxParticles * densityFactor); 
+    const connectionDist = isMobile ? 3.0 : 4.5;
     const connectionDistSq = connectionDist * connectionDist; 
     
     meshRef.current.count = currentParticles; 
@@ -82,24 +80,25 @@ function Particles({ scrollProgress }: { scrollProgress: any }) {
 
     for (let i = 0; i < currentParticles; i++) { 
       const seed = particles.seeds[i];
-      // Slow binary movement + noise
-      particles.pos[i * 3] += particles.vel[i * 3] + Math.sin(time * 0.15 + seed) * 0.0015; 
-      particles.pos[i * 3 + 1] += particles.vel[i * 3 + 1] + Math.cos(time * 0.15 + seed) * 0.0015; 
+      // Gentle floating movement
+      particles.pos[i * 3] += particles.vel[i * 3] + Math.sin(time * 0.2 + seed) * 0.001; 
+      particles.pos[i * 3 + 1] += particles.vel[i * 3 + 1] + Math.cos(time * 0.2 + seed) * 0.001; 
       particles.pos[i * 3 + 2] += particles.vel[i * 3 + 2]; 
 
-      // Boundary wrap for infinite flow
-      if (Math.abs(particles.pos[i * 3]) > 20) particles.pos[i * 3] *= -0.95; 
-      if (Math.abs(particles.pos[i * 3 + 1]) > 15) particles.pos[i * 3 + 1] *= -0.95; 
+      // Infinite wrapping
+      if (particles.pos[i * 3] > 15) particles.pos[i * 3] = -15;
+      if (particles.pos[i * 3] < -15) particles.pos[i * 3] = 15;
+      if (particles.pos[i * 3 + 1] > 12) particles.pos[i * 3 + 1] = -12;
+      if (particles.pos[i * 3 + 1] < -12) particles.pos[i * 3 + 1] = 12;
 
       dummy.position.set(particles.pos[i * 3], particles.pos[i * 3 + 1], particles.pos[i * 3 + 2]); 
       
-      // Activation & Flickering logic
       const distToMouse = mousePos.distanceTo(dummy.position);
-      const isMouseNear = distToMouse < 4;
-      const flicker = 0.8 + Math.sin(time * 5 + seed) * 0.2;
+      const isMouseNear = !isMobile && distToMouse < 4;
+      const flicker = 0.7 + Math.sin(time * 3 + seed) * 0.3;
       const activation = isMouseNear ? 2.5 : flicker;
       
-      const s = (0.025 + Math.sin(time * 0.5 + seed) * 0.01) * activation;
+      const s = (isMobile ? 0.022 : 0.028) * activation;
       dummy.scale.set(s, s, s); 
       
       dummy.updateMatrix(); 
@@ -112,7 +111,7 @@ function Particles({ scrollProgress }: { scrollProgress: any }) {
 
     for (let i = 0; i < currentParticles; i++) { 
       let connections = 0; 
-      for (let j = i + 1; j < currentParticles && connections < MAX_CONNECTIONS; j++) { 
+      for (let j = i + 1; j < currentParticles && connections < actualMaxConnections; j++) { 
         const dx = particles.pos[i * 3] - particles.pos[j * 3]; 
         const dy = particles.pos[i * 3 + 1] - particles.pos[j * 3 + 1]; 
         const dz = particles.pos[i * 3 + 2] - particles.pos[j * 3 + 2]; 
@@ -127,16 +126,15 @@ function Particles({ scrollProgress }: { scrollProgress: any }) {
           linePositions[lineIndex++] = particles.pos[j * 3 + 1]; 
           linePositions[lineIndex++] = particles.pos[j * 3 + 2]; 
 
-          const opacity = THREE.MathUtils.lerp(0.3, 0, Math.sqrt(distSq) / connectionDist);
-          const lineAlpha = opacity * (progress < 0.2 ? 0.3 : 1.0);
+          const opacity = THREE.MathUtils.lerp(isMobile ? 0.25 : 0.4, 0, Math.sqrt(distSq) / connectionDist);
           
-          lineColors[colorIndex++] = currentColor.r * lineAlpha; 
-          lineColors[colorIndex++] = currentColor.g * lineAlpha; 
-          lineColors[colorIndex++] = currentColor.b * lineAlpha; 
+          lineColors[colorIndex++] = currentColor.r * opacity; 
+          lineColors[colorIndex++] = currentColor.g * opacity; 
+          lineColors[colorIndex++] = currentColor.b * opacity; 
 
-          lineColors[colorIndex++] = currentColor.r * lineAlpha; 
-          lineColors[colorIndex++] = currentColor.g * lineAlpha; 
-          lineColors[colorIndex++] = currentColor.b * lineAlpha; 
+          lineColors[colorIndex++] = currentColor.r * opacity; 
+          lineColors[colorIndex++] = currentColor.g * opacity; 
+          lineColors[colorIndex++] = currentColor.b * opacity; 
 
           connections++; 
         } 
@@ -154,20 +152,20 @@ function Particles({ scrollProgress }: { scrollProgress: any }) {
     colorAttribute.copyArray(lineColors); 
     colorAttribute.needsUpdate = true; 
 
-    // Smooth camera drift
-    state.camera.position.y = THREE.MathUtils.lerp(0, -4, progress);
-    state.camera.position.z = THREE.MathUtils.lerp(15, 13, progress);
-    state.camera.lookAt(0, state.camera.position.y * 0.5, 0);
+    // Unified camera movement
+    state.camera.position.y = THREE.MathUtils.lerp(0, -6, progress);
+    state.camera.position.z = isMobile ? 22 : 15;
+    state.camera.lookAt(0, state.camera.position.y * 0.8, 0);
   }); 
 
   return ( 
     <> 
-      <instancedMesh ref={meshRef} args={[undefined, undefined, MAX_PARTICLES]}> 
-        <sphereGeometry args={[1, 12, 12]} /> 
+      <instancedMesh ref={meshRef} args={[undefined, undefined, actualMaxParticles]}> 
+        <sphereGeometry args={[1, isMobile ? 6 : 12, isMobile ? 6 : 12]} /> 
         <meshStandardMaterial 
           color={ELECTRIC_BLUE} 
           emissive={ELECTRIC_BLUE} 
-          emissiveIntensity={3} 
+          emissiveIntensity={isMobile ? 2 : 4} 
           toneMapped={false}
         /> 
       </instancedMesh> 
@@ -175,14 +173,14 @@ function Particles({ scrollProgress }: { scrollProgress: any }) {
         <bufferGeometry> 
           <bufferAttribute 
             attach="attributes-position" 
-            count={MAX_LINES * 2} 
+            count={actualMaxParticles * actualMaxConnections * 2} 
             array={linePositions} 
             itemSize={3} 
             usage={THREE.DynamicDrawUsage} 
           /> 
           <bufferAttribute 
             attach="attributes-color" 
-            count={MAX_LINES * 2} 
+            count={actualMaxParticles * actualMaxConnections * 2} 
             array={lineColors} 
             itemSize={3} 
             usage={THREE.DynamicDrawUsage} 
@@ -191,7 +189,7 @@ function Particles({ scrollProgress }: { scrollProgress: any }) {
         <lineBasicMaterial 
           vertexColors={true} 
           transparent={true} 
-          opacity={0.4} 
+          opacity={0.5} 
           blending={THREE.AdditiveBlending} 
           depthWrite={false}
         /> 
@@ -201,21 +199,37 @@ function Particles({ scrollProgress }: { scrollProgress: any }) {
 } 
 
 export default function NeuralBackground({ scrollProgress }: { scrollProgress: any }) { 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return ( 
     <div style={{ position: 'fixed', inset: 0, zIndex: -1, pointerEvents: 'none', background: BACKGROUND_COLOR }}> 
-      <Canvas camera={{ position: [0, 0, 15], fov: 50 }}> 
+      <Canvas camera={{ position: [0, 0, 15], fov: isMobile ? 65 : 50 }}> 
         <color attach="background" args={[BACKGROUND_COLOR]} /> 
-        <ambientLight intensity={0.15} /> 
-        <pointLight position={[15, 15, 15]} intensity={1.2} color={ELECTRIC_BLUE} /> 
-        <Particles scrollProgress={scrollProgress} /> 
+        <ambientLight intensity={0.2} /> 
+        <pointLight position={[15, 15, 15]} intensity={1.5} color={ELECTRIC_BLUE} /> 
+        <Particles scrollProgress={scrollProgress} isMobile={isMobile} /> 
         <EffectComposer enableNormalPass={false}> 
-          <Bloom luminanceThreshold={0.1} luminanceSmoothing={0.8} intensity={1.8} blendFunction={BlendFunction.ADD} /> 
-          <Noise opacity={0.04} />
-          <ChromaticAberration 
-            offset={new THREE.Vector2(0.0008, 0.0008)} 
-            radialModulation={false}
-            modulationOffset={0}
-          />
+          <Bloom 
+            luminanceThreshold={0.1} 
+            luminanceSmoothing={0.8} 
+            intensity={isMobile ? 1.2 : 2.0} 
+            blendFunction={BlendFunction.ADD} 
+          /> 
+          {!isMobile && <Noise opacity={0.04} />}
+          {!isMobile && (
+            <ChromaticAberration 
+              offset={new THREE.Vector2(0.0008, 0.0008)} 
+              radialModulation={false}
+              modulationOffset={0}
+            />
+          )}
           <Vignette eskil={false} offset={0.1} darkness={1.1} />
         </EffectComposer> 
       </Canvas> 
