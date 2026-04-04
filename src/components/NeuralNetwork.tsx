@@ -29,12 +29,16 @@ function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile
     const seeds = new Float32Array(actualMaxParticles);
     
     // Clustering logic
-    const clusterCount = isMobile ? 8 : 15;
+    const clusterCount = isMobile ? 6 : 15;
     const clusters = [];
     for (let i = 0; i < clusterCount; i++) {
       clusters.push({
-        center: new THREE.Vector3((Math.random() - 0.5) * 25, (Math.random() - 0.5) * 20, (Math.random() - 0.5) * 10),
-        strength: Math.random() * 4 + 2
+        center: new THREE.Vector3(
+          (Math.random() - 0.5) * (isMobile ? 15 : 25), 
+          (Math.random() - 0.5) * (isMobile ? 30 : 20), 
+          (Math.random() - 0.5) * 10
+        ),
+        strength: Math.random() * (isMobile ? 6 : 4) + 2
       });
     }
 
@@ -54,8 +58,8 @@ function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile
     return { pos, vel, seeds }; 
   }, [actualMaxParticles, isMobile]); 
 
-  const linePositions = useMemo(() => new Float32Array(actualMaxParticles * actualMaxConnections * 2 * 3), [actualMaxParticles]); 
-  const lineColors = useMemo(() => new Float32Array(actualMaxParticles * actualMaxConnections * 2 * 3), [actualMaxParticles]); 
+  const linePositions = useMemo(() => new Float32Array(actualMaxParticles * actualMaxConnections * 2 * 3), [actualMaxParticles, actualMaxConnections]); 
+  const lineColors = useMemo(() => new Float32Array(actualMaxParticles * actualMaxConnections * 2 * 3), [actualMaxParticles, actualMaxConnections]); 
 
   useFrame((state) => { 
     if (!meshRef.current || !linesRef.current) return; 
@@ -86,10 +90,13 @@ function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile
       particles.pos[i * 3 + 2] += particles.vel[i * 3 + 2]; 
 
       // Infinite wrapping
-      if (particles.pos[i * 3] > 15) particles.pos[i * 3] = -15;
-      if (particles.pos[i * 3] < -15) particles.pos[i * 3] = 15;
-      if (particles.pos[i * 3 + 1] > 12) particles.pos[i * 3 + 1] = -12;
-      if (particles.pos[i * 3 + 1] < -12) particles.pos[i * 3 + 1] = 12;
+      const boundaryX = isMobile ? 12 : 15;
+      const boundaryY = isMobile ? 20 : 12;
+      
+      if (particles.pos[i * 3] > boundaryX) particles.pos[i * 3] = -boundaryX;
+      if (particles.pos[i * 3] < -boundaryX) particles.pos[i * 3] = boundaryX;
+      if (particles.pos[i * 3 + 1] > boundaryY) particles.pos[i * 3 + 1] = -boundaryY;
+      if (particles.pos[i * 3 + 1] < -boundaryY) particles.pos[i * 3 + 1] = boundaryY;
 
       dummy.position.set(particles.pos[i * 3], particles.pos[i * 3 + 1], particles.pos[i * 3 + 2]); 
       
@@ -142,25 +149,30 @@ function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile
     } 
 
     const geometry = linesRef.current.geometry as THREE.BufferGeometry; 
-    geometry.setDrawRange(0, lineIndex / 3); 
     
     const posAttribute = geometry.attributes.position as THREE.BufferAttribute; 
-    posAttribute.copyArray(linePositions); 
-    posAttribute.needsUpdate = true; 
+    if (posAttribute && posAttribute.array.length >= lineIndex) {
+      posAttribute.set(linePositions.subarray(0, lineIndex)); 
+      posAttribute.needsUpdate = true; 
+    }
 
     const colorAttribute = geometry.attributes.color as THREE.BufferAttribute; 
-    colorAttribute.copyArray(lineColors); 
-    colorAttribute.needsUpdate = true; 
+    if (colorAttribute && colorAttribute.array.length >= colorIndex) {
+      colorAttribute.set(lineColors.subarray(0, colorIndex)); 
+      colorAttribute.needsUpdate = true; 
+    }
 
+    geometry.setDrawRange(0, lineIndex / 3); 
+    
     // Unified camera movement
-    state.camera.position.y = THREE.MathUtils.lerp(0, -6, progress);
-    state.camera.position.z = isMobile ? 22 : 15;
-    state.camera.lookAt(0, state.camera.position.y * 0.8, 0);
+    state.camera.position.y = THREE.MathUtils.lerp(0, -10, progress);
+    state.camera.position.z = isMobile ? 18 : 15;
+    state.camera.lookAt(0, state.camera.position.y * 0.9, 0);
   }); 
 
   return ( 
     <> 
-      <instancedMesh ref={meshRef} args={[undefined, undefined, actualMaxParticles]}> 
+      <instancedMesh key={`particles-${actualMaxParticles}`} ref={meshRef} args={[undefined, undefined, actualMaxParticles]}> 
         <sphereGeometry args={[1, isMobile ? 6 : 12, isMobile ? 6 : 12]} /> 
         <meshStandardMaterial 
           color={ELECTRIC_BLUE} 
@@ -169,7 +181,7 @@ function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile
           toneMapped={false}
         /> 
       </instancedMesh> 
-      <lineSegments ref={linesRef}> 
+      <lineSegments key={`lines-${actualMaxParticles}`} ref={linesRef}> 
         <bufferGeometry> 
           <bufferAttribute 
             attach="attributes-position" 
@@ -210,7 +222,7 @@ export default function NeuralBackground({ scrollProgress }: { scrollProgress: a
 
   return ( 
     <div style={{ position: 'fixed', inset: 0, zIndex: -1, pointerEvents: 'none', background: BACKGROUND_COLOR }}> 
-      <Canvas camera={{ position: [0, 0, 15], fov: isMobile ? 65 : 50 }}> 
+      <Canvas camera={{ position: [0, 0, 15], fov: isMobile ? 65 : 50 }} dpr={[1, 2]}> 
         <color attach="background" args={[BACKGROUND_COLOR]} /> 
         <ambientLight intensity={0.2} /> 
         <pointLight position={[15, 15, 15]} intensity={1.5} color={ELECTRIC_BLUE} /> 
@@ -222,15 +234,14 @@ export default function NeuralBackground({ scrollProgress }: { scrollProgress: a
             intensity={isMobile ? 1.2 : 2.0} 
             blendFunction={BlendFunction.ADD} 
           /> 
-          {!isMobile && <Noise opacity={0.04} />}
-          {!isMobile && (
-            <ChromaticAberration 
-              offset={new THREE.Vector2(0.0008, 0.0008)} 
-              radialModulation={false}
-              modulationOffset={0}
-            />
-          )}
-          <Vignette eskil={false} offset={0.1} darkness={1.1} />
+          <Noise opacity={isMobile ? 0 : 0.04} />
+          <ChromaticAberration 
+            opacity={isMobile ? 0 : 1}
+            offset={new THREE.Vector2(0.0008, 0.0008)} 
+            radialModulation={false}
+            modulationOffset={0}
+          />
+          <Vignette offset={0.1} darkness={1.1} />
         </EffectComposer> 
       </Canvas> 
     </div> 
