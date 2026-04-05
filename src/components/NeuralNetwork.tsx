@@ -19,40 +19,28 @@ function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile
   
   const dummy = useMemo(() => new THREE.Object3D(), []); 
   
-  // Optimize particle count based on device
-  const actualMaxParticles = isMobile ? 400 : 800;
-  const actualMaxConnections = isMobile ? 3 : 5;
+  // Ultra-high density and faster movement
+  const actualMaxParticles = isMobile ? 1000 : 2000;
+  const actualMaxConnections = isMobile ? 3 : 6; 
 
   const particles = useMemo(() => { 
     const pos = new Float32Array(actualMaxParticles * 3); 
     const vel = new Float32Array(actualMaxParticles * 3); 
     const seeds = new Float32Array(actualMaxParticles);
     
-    // Clustering logic
-    const clusterCount = isMobile ? 6 : 15;
-    const clusters = [];
-    for (let i = 0; i < clusterCount; i++) {
-      clusters.push({
-        center: new THREE.Vector3(
-          (Math.random() - 0.5) * (isMobile ? 15 : 25), 
-          (Math.random() - 0.5) * (isMobile ? 30 : 20), 
-          (Math.random() - 0.5) * 10
-        ),
-        strength: Math.random() * (isMobile ? 6 : 4) + 2
-      });
-    }
+    // Extreme depth for the "pop out" effect
+    const spreadX = isMobile ? 35 : 55;
+    const spreadY = isMobile ? 45 : 35;
+    const spreadZ = isMobile ? 40 : 60; 
 
     for (let i = 0; i < actualMaxParticles; i++) { 
-      const cluster = clusters[i % clusterCount];
-      const spread = cluster.strength;
+      pos[i * 3] = (Math.random() - 0.5) * spreadX; 
+      pos[i * 3 + 1] = (Math.random() - 0.5) * spreadY; 
+      pos[i * 3 + 2] = (Math.random() - 0.6) * spreadZ; 
       
-      pos[i * 3] = cluster.center.x + (Math.random() - 0.5) * spread; 
-      pos[i * 3 + 1] = cluster.center.y + (Math.random() - 0.5) * spread; 
-      pos[i * 3 + 2] = cluster.center.z + (Math.random() - 0.5) * spread; 
-      
-      vel[i * 3] = (Math.random() - 0.5) * 0.002; 
-      vel[i * 3 + 1] = (Math.random() - 0.5) * 0.002; 
-      vel[i * 3 + 2] = (Math.random() - 0.5) * 0.002; 
+      vel[i * 3] = (Math.random() - 0.5) * 0.008; 
+      vel[i * 3 + 1] = (Math.random() - 0.5) * 0.008; 
+      vel[i * 3 + 2] = (Math.random() - 0.1) * 0.015; // Much faster flow towards camera
       seeds[i] = Math.random() * 1000;
     } 
     return { pos, vel, seeds }; 
@@ -67,13 +55,12 @@ function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile
     const time = state.clock.getElapsedTime();
     const progress = scrollProgress.get(); 
     
-    // Smooth density transition
-    const densityFactor = THREE.MathUtils.lerp(0.15, 1.0, progress);
-    const colorTransition = Math.max(0, (progress - 0.5) * 2);
-    const currentColor = ELECTRIC_BLUE.clone().lerp(WINE_RED, colorTransition);
-
+    // Neural network is now always fully expanded and denser
+    const densityFactor = THREE.MathUtils.lerp(0.4, 1.0, progress);
     const currentParticles = Math.floor(actualMaxParticles * densityFactor); 
-    const connectionDist = isMobile ? 3.0 : 4.5;
+    
+    // Wider connection distance for that "web" look
+    const connectionDist = THREE.MathUtils.lerp(isMobile ? 4.0 : 6.0, isMobile ? 6.0 : 9.0, progress);
     const connectionDistSq = connectionDist * connectionDist; 
     
     meshRef.current.count = currentParticles; 
@@ -82,30 +69,43 @@ function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile
     const mouseY = (mouse.y * viewport.height) / 2;
     const mousePos = new THREE.Vector3(mouseX, mouseY, 0);
 
+    const boundaryX = isMobile ? 20 : 30;
+    const boundaryY = isMobile ? 25 : 20;
+    const boundaryZ_Front = 15; // Point where particles "exit" or wrap back
+    const boundaryZ_Back = isMobile ? -25 : -40;
+
     for (let i = 0; i < currentParticles; i++) { 
       const seed = particles.seeds[i];
-      // Gentle floating movement
-      particles.pos[i * 3] += particles.vel[i * 3] + Math.sin(time * 0.2 + seed) * 0.001; 
-      particles.pos[i * 3 + 1] += particles.vel[i * 3 + 1] + Math.cos(time * 0.2 + seed) * 0.001; 
+      
+      // Fluid movement + natural drift towards camera
+      particles.pos[i * 3] += particles.vel[i * 3] + Math.sin(time * 0.5 + seed) * 0.005; 
+      particles.pos[i * 3 + 1] += particles.vel[i * 3 + 1] + Math.cos(time * 0.5 + seed) * 0.005; 
       particles.pos[i * 3 + 2] += particles.vel[i * 3 + 2]; 
 
-      // Infinite wrapping
-      const boundaryX = isMobile ? 12 : 15;
-      const boundaryY = isMobile ? 20 : 12;
-      
+      // Infinite wrapping with depth focus
       if (particles.pos[i * 3] > boundaryX) particles.pos[i * 3] = -boundaryX;
       if (particles.pos[i * 3] < -boundaryX) particles.pos[i * 3] = boundaryX;
       if (particles.pos[i * 3 + 1] > boundaryY) particles.pos[i * 3 + 1] = -boundaryY;
       if (particles.pos[i * 3 + 1] < -boundaryY) particles.pos[i * 3 + 1] = boundaryY;
+      
+      // Pop-out logic: if it passes the camera (Z > boundaryZ_Front), wrap it to the far back
+      if (particles.pos[i * 3 + 2] > boundaryZ_Front) {
+        particles.pos[i * 3 + 2] = boundaryZ_Back;
+      }
 
       dummy.position.set(particles.pos[i * 3], particles.pos[i * 3 + 1], particles.pos[i * 3 + 2]); 
       
       const distToMouse = mousePos.distanceTo(dummy.position);
       const isMouseNear = !isMobile && distToMouse < 4;
-      const flicker = 0.7 + Math.sin(time * 3 + seed) * 0.3;
-      const activation = isMouseNear ? 2.5 : flicker;
       
-      const s = (isMobile ? 0.022 : 0.028) * activation;
+      // Scaling based on distance to camera (closer = larger)
+      const distToCam = 20 - particles.pos[i * 3 + 2];
+      const depthScale = THREE.MathUtils.clamp(1.5 - distToCam / 25, 0.5, 2.5);
+      
+      const flicker = 0.7 + Math.sin(time * 3 + seed) * 0.3;
+      const activation = isMouseNear ? 3.0 : flicker;
+      
+      const s = (isMobile ? 0.022 : 0.028) * activation * depthScale;
       dummy.scale.set(s, s, s); 
       
       dummy.updateMatrix(); 
@@ -115,6 +115,7 @@ function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile
 
     let lineIndex = 0; 
     let colorIndex = 0; 
+    const currentColor = ELECTRIC_BLUE;
 
     for (let i = 0; i < currentParticles; i++) { 
       let connections = 0; 
@@ -133,7 +134,9 @@ function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile
           linePositions[lineIndex++] = particles.pos[j * 3 + 1]; 
           linePositions[lineIndex++] = particles.pos[j * 3 + 2]; 
 
-          const opacity = THREE.MathUtils.lerp(isMobile ? 0.25 : 0.4, 0, Math.sqrt(distSq) / connectionDist);
+          // More intense connections
+          const distOpacity = 1 - Math.sqrt(distSq) / connectionDist;
+          const opacity = THREE.MathUtils.lerp(0.3, 0.7, progress) * distOpacity;
           
           lineColors[colorIndex++] = currentColor.r * opacity; 
           lineColors[colorIndex++] = currentColor.g * opacity; 
@@ -164,10 +167,9 @@ function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile
 
     geometry.setDrawRange(0, lineIndex / 3); 
     
-    // Unified camera movement
-    state.camera.position.y = THREE.MathUtils.lerp(0, -10, progress);
-    state.camera.position.z = isMobile ? 18 : 15;
-    state.camera.lookAt(0, state.camera.position.y * 0.9, 0);
+    // Camera moves forward slightly with scroll for added depth
+    state.camera.position.z = 20 - (progress * 5);
+    state.camera.lookAt(0, 0, 0);
   }); 
 
   return ( 
@@ -229,9 +231,9 @@ export default function NeuralBackground({ scrollProgress }: { scrollProgress: a
         <Particles scrollProgress={scrollProgress} isMobile={isMobile} /> 
         <EffectComposer enableNormalPass={false}> 
           <Bloom 
-            luminanceThreshold={0.1} 
-            luminanceSmoothing={0.8} 
-            intensity={isMobile ? 1.2 : 2.0} 
+            luminanceThreshold={0.05} 
+            luminanceSmoothing={0.9} 
+            intensity={isMobile ? 1.5 : 2.5} 
             blendFunction={BlendFunction.ADD} 
           /> 
           <Noise opacity={isMobile ? 0 : 0.04} />
