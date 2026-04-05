@@ -29,6 +29,39 @@ const App: React.FC = () => {
     'Liderazgo', 'Resolución de Problemas', 'Trabajo en Equipo'
   ];
 
+  const experience = [
+    {
+      company: 'Independiente',
+      role: 'Landing Page - Invitación de Matrimonio',
+      period: 'Febrero 2026',
+      desc: 'Diseño y desarrollo de una landing page interactiva personalizada para invitación de bodas, optimizada para dispositivos móviles.'
+    },
+    {
+      company: 'Grupo BSA',
+      role: 'Asistente de sistemas',
+      period: '2022 - 2023',
+      desc: 'Encargado del soporte técnico, mantenimiento de equipos, gestión de redes y atención a necesidades tecnológicas de la empresa.'
+    },
+    {
+      company: 'Refrigeración H y T',
+      role: 'Desarrollador web',
+      period: '2023',
+      desc: 'Desarrollo y despliegue de un catálogo de productos web con tecnologías HTML, CSS y JavaScript.'
+    },
+    {
+      company: 'Chevrolet',
+      role: 'Publicidad y ventas',
+      period: '2020 - 2021',
+      desc: 'Estrategias de marketing, promoción de vehículos y atención al cliente en área comercial.'
+    },
+    {
+      company: 'MCA',
+      role: 'Publicidad y ventas',
+      period: '2019 - 2020',
+      desc: 'Creación de contenido publicitario y trabajo en ventas directas al consumidor.'
+    }
+  ];
+
   const education = [
     {
       title: 'Ingeniero en Sistemas',
@@ -56,7 +89,7 @@ const App: React.FC = () => {
     bg: '#050505'
   };
 
-  const navItems = ['Inicio', 'Sobre Mí', 'Habilidades', 'Educación', 'Contacto'];
+  const navItems = ['Inicio', 'Sobre Mí', 'Habilidades', 'Experiencia', 'Educación', 'Contacto'];
 
   return (
     <div className="app-container">
@@ -354,6 +387,67 @@ const App: React.FC = () => {
                 />
               </div>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Experience Section - Card Deck Accordion */}
+      <section id="experiencia" style={{ padding: isMobile ? '40px 25px' : '150px 100px' }}>
+        <div style={{ textAlign: 'center', marginBottom: isMobile ? '30px' : '100px' }}>
+          <span style={{ color: colors.electricBlue, letterSpacing: '5px', textTransform: 'uppercase', fontSize: isMobile ? '0.7rem' : '0.8rem', fontWeight: 600 }}>Trayectoria Profesional</span>
+          <h2 style={{ color: 'white', fontSize: isMobile ? '2rem' : '4rem', marginTop: '10px', fontFamily: "'Playfair Display', serif", fontWeight: 700 }}>Experiencia Laboral</h2>
+        </div>
+
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center',
+          maxWidth: '800px',
+          margin: '0 auto',
+          position: 'relative',
+          padding: '100px 0'
+        }}>
+          {experience.map((exp, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ y: idx * 20, rotate: idx % 2 === 0 ? 1 : -1 }}
+              whileHover={{ 
+                y: -50,
+                rotate: 0,
+                scale: 1.05,
+                zIndex: 50,
+                transition: { type: 'spring', stiffness: 300 }
+              }}
+              style={{
+                width: '100%',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: `1px solid ${colors.accentBlue}`,
+                borderRadius: '16px',
+                padding: isMobile ? '20px' : '40px',
+                backdropFilter: 'blur(20px)',
+                cursor: 'pointer',
+                marginTop: idx === 0 ? 0 : '-100px',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+                position: 'relative',
+                zIndex: idx
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
+                <div>
+                  <h3 style={{ color: 'white', fontSize: isMobile ? '1.1rem' : '1.6rem', margin: 0, fontFamily: "'Playfair Display', serif" }}>{exp.role}</h3>
+                  <p style={{ color: colors.electricBlue, fontSize: '0.85rem', fontWeight: 600, marginTop: '8px', letterSpacing: '1px' }}>{exp.company}</p>
+                </div>
+                <span style={{ 
+                  color: colors.electricBlue, 
+                  fontSize: '0.7rem', 
+                  padding: '4px 12px', 
+                  border: `1px solid ${colors.accentBlue}`,
+                  borderRadius: '20px',
+                  background: 'rgba(0, 198, 255, 0.05)'
+                }}>{exp.period}</span>
+              </div>
+              <p style={{ color: colors.textSec, fontSize: isMobile ? '0.9rem' : '1.1rem', lineHeight: 1.7, margin: 0, fontWeight: 300 }}>{exp.desc}</p>
+            </motion.div>
           ))}
         </div>
       </section>
