@@ -288,13 +288,13 @@ const App: React.FC = () => {
         height: 'calc(var(--app-vh, 1vh) * 100)', 
         display: 'flex', 
         alignItems: 'center', 
-        padding: isMobile ? '0 25px' : '0 100px' 
+        padding: isMobile ? '0 20px' : '0 100px' 
       }}>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
-          style={{ maxWidth: isMobile ? '560px' : '860px' }}
+          style={{ width: '100%', maxWidth: isMobile ? '620px' : '860px' }}
         >
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -309,7 +309,9 @@ const App: React.FC = () => {
               border: `1px solid ${colors.accentBlue}`,
               borderRadius: '999px',
               background: 'rgba(255,255,255,0.03)',
-              backdropFilter: 'blur(10px)'
+              backdropFilter: 'blur(10px)',
+              maxWidth: '100%',
+              flexWrap: 'wrap'
             }}
           >
             <span style={{ 
@@ -321,12 +323,17 @@ const App: React.FC = () => {
             }} />
             <span style={{ 
               color: colors.textMain, 
-              fontSize: isMobile ? '0.68rem' : '0.74rem', 
-              letterSpacing: '2.5px', 
+              fontSize: isMobile ? '0.66rem' : '0.74rem', 
+              letterSpacing: isMobile ? '2px' : '2.5px', 
               textTransform: 'uppercase',
-              opacity: 0.9
+              opacity: 0.9,
+              lineHeight: 1.2
             }}>
-              Ingeniero • Full-Stack • IA
+              <span style={{ whiteSpace: 'nowrap' }}>Ingeniero</span>
+              <span style={{ opacity: 0.65, padding: '0 10px' }}>•</span>
+              <span style={{ whiteSpace: 'nowrap' }}>Full‑Stack</span>
+              <span style={{ opacity: 0.65, padding: '0 10px' }}>•</span>
+              <span style={{ whiteSpace: 'nowrap' }}>IA</span>
             </span>
           </motion.div>
 
@@ -346,7 +353,7 @@ const App: React.FC = () => {
           />
 
           <h1 style={{ 
-            fontSize: isMobile ? 'clamp(2.6rem, 10.5vw, 3.2rem)' : 'clamp(3.8rem, 5.8vw, 6.2rem)', 
+            fontSize: isMobile ? 'clamp(2.35rem, 9.8vw, 3.05rem)' : 'clamp(3.8rem, 5.8vw, 6.2rem)', 
             margin: '0 0 14px', 
             color: 'white', 
             fontFamily: "'Playfair Display', serif",
@@ -358,11 +365,11 @@ const App: React.FC = () => {
           </h1>
           
           <p style={{ 
-            fontSize: isMobile ? '1rem' : '1.4rem', 
+            fontSize: isMobile ? '0.98rem' : '1.4rem', 
             color: colors.textMain, 
             fontWeight: 300,
             letterSpacing: '0.5px',
-            lineHeight: 1.5,
+            lineHeight: isMobile ? 1.55 : 1.5,
             marginBottom: isMobile ? '22px' : '28px',
             maxWidth: isMobile ? '100%' : '650px',
             opacity: 0.8
