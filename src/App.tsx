@@ -31,6 +31,13 @@ const App: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [menuOpen]);
+
   const skills = [
     { name: 'Desarrollo Full-Stack', level: 95 },
     { name: 'Arquitectura de IA', level: 90 },
@@ -147,89 +154,131 @@ const App: React.FC = () => {
           {isMobile ? 'DAVID AITE' : 'DAVID FELIPE AITE TREJO'}
         </div>
 
-        {isMobile ? (
-          <button 
-            onClick={() => setMenuOpen(!menuOpen)}
-            style={{ 
-              background: 'rgba(255,255,255,0.05)', 
-              border: 'none', 
-              color: 'white', 
-              cursor: 'pointer',
-              padding: '8px',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            {menuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        ) : (
-          <nav>
-            <ul style={{ display: 'flex', listStyle: 'none', gap: '40px', margin: 0, padding: 0 }}>
-              {navItems.map((item) => (
-                <li key={item}>
-                  <a href={`#${item.toLowerCase().replace(' ', '-')}`} style={{ 
-                    color: 'white', 
-                    textDecoration: 'none', 
-                    fontSize: '0.75rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '2px',
-                    fontWeight: 400,
-                    opacity: 0.6,
-                    transition: 'opacity 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                  onMouseLeave={(e) => e.currentTarget.style.opacity = '0.6'}
-                  >{item}</a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        )}
+        <button 
+          onClick={() => setMenuOpen(!menuOpen)}
+          style={{ 
+            background: 'rgba(255,255,255,0.05)', 
+            border: `1px solid ${colors.accentBlue}`, 
+            color: 'white', 
+            cursor: 'pointer',
+            padding: isMobile ? '8px' : '10px',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backdropFilter: 'blur(14px)'
+          }}
+        >
+          {menuOpen ? <X size={isMobile ? 20 : 22} /> : <Menu size={isMobile ? 20 : 22} />}
+        </button>
       </header>
 
-      {/* Mobile Menu Overlay */}
+      {/* Menu Overlay */}
       <AnimatePresence>
-        {isMobile && menuOpen && (
+        {menuOpen && (
           <motion.div
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setMenuOpen(false)}
             style={{
               position: 'fixed',
-              top: 0,
-              right: 0,
-              width: '100%',
-              height: 'calc(var(--app-vh, 1vh) * 100)',
-              background: '#050505',
-              zIndex: 99,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: '30px'
+              inset: 0,
+              zIndex: 1000,
+              background: isMobile ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.55)',
+              backdropFilter: 'blur(8px)'
             }}
           >
-            {navItems.map((item, idx) => (
-              <motion.a 
-                key={item}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                href={`#${item.toLowerCase().replace(' ', '-')}`}
-                onClick={() => setMenuOpen(false)}
-                style={{ 
-                  color: 'white', 
-                  textDecoration: 'none', 
-                  fontSize: '1.2rem',
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', ease: [0.16, 1, 0.3, 1], duration: 0.45 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                width: isMobile ? '100%' : 'min(460px, 92vw)',
+                height: 'calc(var(--app-vh, 1vh) * 100)',
+                background: 'radial-gradient(circle at 30% 20%, rgba(0, 198, 255, 0.10), rgba(5, 5, 5, 0.98) 55%)',
+                borderLeft: isMobile ? 'none' : `1px solid ${colors.accentBlue}`,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                alignItems: 'stretch',
+                padding: '20px 22px 30px',
+                gap: '12px',
+                overflowY: 'auto'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 2px 14px' }}>
+                <div style={{ 
+                  color: colors.electricBlue, 
+                  fontSize: '0.8rem', 
+                  fontWeight: 700, 
+                  letterSpacing: '3px', 
                   textTransform: 'uppercase',
-                  letterSpacing: '5px',
-                  fontWeight: 300,
-                  opacity: 0.8
-                }}
-              >{item}</motion.a>
-            ))}
+                  textShadow: `0 0 15px ${colors.accentBlue}`,
+                  lineHeight: 1.2
+                }}>
+                  Menú
+                </div>
+                <button
+                  onClick={() => setMenuOpen(false)}
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${colors.accentBlue}`,
+                    color: 'white',
+                    cursor: 'pointer',
+                    padding: '10px',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backdropFilter: 'blur(14px)'
+                  }}
+                >
+                  <X size={22} />
+                </button>
+              </div>
+              {navItems.map((item, idx) => (
+                <motion.a 
+                  key={item}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.07 }}
+                  whileTap={{ scale: 0.98 }}
+                  href={`#${item.toLowerCase().replace(' ', '-')}`}
+                  onClick={() => setMenuOpen(false)}
+                  style={{ 
+                    color: 'white', 
+                    textDecoration: 'none', 
+                    fontSize: '1.05rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '3px',
+                    fontWeight: 500,
+                    opacity: 0.95,
+                    border: `1px solid ${colors.accentBlue}`,
+                    borderRadius: '16px',
+                    padding: '16px 16px',
+                    background: 'rgba(255,255,255,0.03)',
+                    backdropFilter: 'blur(14px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                    <span style={{ color: colors.electricBlue, fontSize: '0.75rem', letterSpacing: '2px', opacity: 0.9 }}>
+                      {String(idx + 1).padStart(2, '0')}
+                    </span>
+                    <span>{item}</span>
+                  </span>
+                  <span style={{ color: colors.electricBlue, opacity: 0.85, fontSize: '0.9rem' }}>↗</span>
+                </motion.a>
+              ))}
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -245,34 +294,67 @@ const App: React.FC = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
-          style={{ maxWidth: '900px' }}
+          style={{ maxWidth: isMobile ? '560px' : '860px' }}
         >
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.1, ease: "easeOut" }}
+            style={{ 
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              marginBottom: isMobile ? '16px' : '22px',
+              padding: isMobile ? '8px 12px' : '10px 16px',
+              border: `1px solid ${colors.accentBlue}`,
+              borderRadius: '999px',
+              background: 'rgba(255,255,255,0.03)',
+              backdropFilter: 'blur(10px)'
+            }}
+          >
+            <span style={{ 
+              width: '8px', 
+              height: '8px', 
+              borderRadius: '999px', 
+              background: colors.electricBlue, 
+              boxShadow: `0 0 18px ${colors.electricBlue}` 
+            }} />
+            <span style={{ 
+              color: colors.textMain, 
+              fontSize: isMobile ? '0.68rem' : '0.74rem', 
+              letterSpacing: '2.5px', 
+              textTransform: 'uppercase',
+              opacity: 0.9
+            }}>
+              Ingeniero • Full-Stack • IA
+            </span>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scaleX: 0.6 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            transition={{ duration: 1.1, ease: "easeOut", delay: 0.05 }}
+            style={{
+              height: '2px',
+              width: isMobile ? '140px' : '200px',
+              transformOrigin: 'left',
+              background: `linear-gradient(90deg, ${colors.electricBlue}, transparent)`,
+              boxShadow: `0 0 22px ${colors.electricBlue}`,
+              opacity: 0.85,
+              marginBottom: isMobile ? '18px' : '26px'
+            }}
+          />
+
           <h1 style={{ 
-            fontSize: isMobile ? '2.8rem' : '8rem', 
-            margin: '0 0 15px', 
+            fontSize: isMobile ? 'clamp(2.6rem, 10.5vw, 3.2rem)' : 'clamp(3.8rem, 5.8vw, 6.2rem)', 
+            margin: '0 0 14px', 
             color: 'white', 
             fontFamily: "'Playfair Display', serif",
-            lineHeight: 1.1,
+            lineHeight: 1.06,
             fontWeight: 700,
             letterSpacing: isMobile ? '-1px' : '-2px'
           }}>
             David Felipe<br/>Aite Trejo
-            <motion.span 
-              animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
-              transition={{ duration: 3, repeat: Infinity }}
-              style={{ 
-                display: 'inline-block', 
-                width: isMobile ? '8px' : '14px', 
-                height: isMobile ? '8px' : '14px', 
-                backgroundColor: colors.electricBlue, 
-                borderRadius: '50%', 
-                marginLeft: isMobile ? '6px' : '15px',
-                boxShadow: `0 0 20px ${colors.electricBlue}`,
-                verticalAlign: 'middle',
-                position: 'relative',
-                bottom: isMobile ? '2px' : '15px'
-              }} 
-            />
           </h1>
           
           <p style={{ 
@@ -281,12 +363,61 @@ const App: React.FC = () => {
             fontWeight: 300,
             letterSpacing: '0.5px',
             lineHeight: 1.5,
-            marginBottom: isMobile ? '35px' : '60px',
+            marginBottom: isMobile ? '22px' : '28px',
             maxWidth: isMobile ? '100%' : '650px',
             opacity: 0.8
           }}>
             Transformando visión en realidad técnica con diseño de alto impacto y arquitectura de software de elite.
           </p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.1, ease: "easeOut", delay: 0.15 }}
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: isMobile ? '10px' : '12px',
+              maxWidth: isMobile ? '100%' : '720px',
+              marginBottom: isMobile ? '26px' : '44px'
+            }}
+          >
+            {[
+              { label: 'Enfoque', value: 'Sistemas & Producto' },
+              { label: 'Especialidad', value: 'IA + Full-Stack' },
+              { label: 'Entrega', value: 'Web responsive' }
+            ].map((item) => (
+              <div
+                key={item.label}
+                style={{
+                  padding: isMobile ? '10px 12px' : '12px 14px',
+                  borderRadius: '999px',
+                  border: `1px solid ${colors.accentBlue}`,
+                  background: 'rgba(255,255,255,0.02)',
+                  backdropFilter: 'blur(10px)'
+                }}
+              >
+                <div style={{ 
+                  color: colors.electricBlue, 
+                  fontSize: '0.65rem', 
+                  letterSpacing: '3.5px', 
+                  textTransform: 'uppercase',
+                  fontWeight: 600,
+                  marginBottom: '4px'
+                }}>
+                  {item.label}
+                </div>
+                <div style={{ 
+                  color: 'white', 
+                  fontSize: isMobile ? '0.95rem' : '1.02rem',
+                  fontWeight: 500,
+                  letterSpacing: '0.3px'
+                }}>
+                  {item.value}
+                </div>
+              </div>
+            ))}
+          </motion.div>
 
           <motion.a 
             href="#contacto" 

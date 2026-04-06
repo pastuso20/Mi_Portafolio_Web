@@ -58,15 +58,16 @@ function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile
     const currentParticles = Math.max(8, Math.floor(actualMaxParticles * densityFactor)); 
     meshRef.current.count = currentParticles; 
 
-    const progressSmooth = progress * progress * (3 - 2 * progress);
-    const radialScale = THREE.MathUtils.lerp(isMobile ? 1.45 : 1.6, isMobile ? 2.25 : 2.6, progressSmooth);
+    const progressFast = Math.min(1, progress * 2.35);
+    const progressSmooth = progressFast * progressFast * (3 - 2 * progressFast);
+    const radialScale = THREE.MathUtils.lerp(isMobile ? 0.95 : 0.9, isMobile ? 4.1 : 4.7, progressSmooth);
 
     const mouseX = (mouse.x * viewport.width) / 2;
     const mouseY = (mouse.y * viewport.height) / 2;
     const mousePos = new THREE.Vector3(mouseX, mouseY, 0);
 
     const orbitAngle = progress * Math.PI * 2 + time * 0.08;
-    const orbitRadius = isMobile ? 22 : 24;
+    const orbitRadius = isMobile ? 24 : 26;
     const orbitAmp = isMobile ? 5.5 : 7.5;
 
     state.camera.position.x = mouse.x * 1.8;
@@ -74,7 +75,7 @@ function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile
     state.camera.position.z = orbitRadius + Math.cos(orbitAngle) * orbitAmp;
     state.camera.lookAt(0, 0, 0);
 
-    const connectionDist = THREE.MathUtils.lerp(isMobile ? 2.6 : 2.8, isMobile ? 3.4 : 3.9, progressSmooth);
+    const connectionDist = THREE.MathUtils.lerp(isMobile ? 2.7 : 2.9, isMobile ? 6.2 : 7.5, progressSmooth);
     const connectionDistSq = connectionDist * connectionDist; 
     const restLen = connectionDist * 0.62;
     const repulsionRadius = connectionDist * 0.85;
