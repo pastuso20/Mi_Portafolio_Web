@@ -9,10 +9,26 @@ const App: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
+    const updateVh = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--app-vh', `${vh}px`);
+    };
+
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+
+    const handleResize = () => {
+      updateVh();
+      checkMobile();
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
   }, []);
 
   const skills = [
@@ -185,7 +201,7 @@ const App: React.FC = () => {
               top: 0,
               right: 0,
               width: '100%',
-              height: '100vh',
+              height: 'calc(var(--app-vh, 1vh) * 100)',
               background: '#050505',
               zIndex: 99,
               display: 'flex',
@@ -220,7 +236,7 @@ const App: React.FC = () => {
 
       {/* Hero Section */}
       <section id="inicio" style={{ 
-        height: '100vh', 
+        height: 'calc(var(--app-vh, 1vh) * 100)', 
         display: 'flex', 
         alignItems: 'center', 
         padding: isMobile ? '0 25px' : '0 100px' 
@@ -405,12 +421,12 @@ const App: React.FC = () => {
           maxWidth: '800px',
           margin: '0 auto',
           position: 'relative',
-          padding: '100px 0'
+          padding: isMobile ? '20px 0' : '100px 0'
         }}>
           {experience.map((exp, idx) => (
             <motion.div
               key={idx}
-              initial={{ y: idx * 20, rotate: idx % 2 === 0 ? 1 : -1 }}
+              initial={isMobile ? { y: 0, rotate: 0 } : { y: idx * 20, rotate: idx % 2 === 0 ? 1 : -1 }}
               whileHover={{ 
                 y: -50,
                 rotate: 0,
@@ -426,10 +442,10 @@ const App: React.FC = () => {
                 padding: isMobile ? '20px' : '40px',
                 backdropFilter: 'blur(20px)',
                 cursor: 'pointer',
-                marginTop: idx === 0 ? 0 : '-100px',
+                marginTop: isMobile ? '16px' : (idx === 0 ? 0 : '-100px'),
                 boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
                 position: 'relative',
-                zIndex: idx
+                zIndex: isMobile ? 1 : idx
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
@@ -532,6 +548,8 @@ const App: React.FC = () => {
       <style>{`
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
+        :root { --app-vh: 1vh; }
+        html, body, #root { height: 100%; }
         body {
           margin: 0;
           padding: 0;
@@ -539,6 +557,8 @@ const App: React.FC = () => {
           background: #050505;
           color: white;
           overflow-x: hidden;
+          -webkit-text-size-adjust: 100%;
+          text-size-adjust: 100%;
         }
         ::selection { background: ${colors.electricBlue}; color: black; }
         ::-webkit-scrollbar { width: 3px; }
