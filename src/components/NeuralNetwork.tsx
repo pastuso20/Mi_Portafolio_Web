@@ -7,15 +7,16 @@ import { BlendFunction } from 'postprocessing';
 const ELECTRIC_BLUE = new THREE.Color('#00C6FF');
 const BACKGROUND_COLOR = '#050505';
 
-function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile: boolean }) { 
+function Particles({ scrollProgress, isMobile, lowPower }: { scrollProgress: any, isMobile: boolean, lowPower: boolean }) { 
   const meshRef = useRef<THREE.InstancedMesh>(null); 
   const linesRef = useRef<THREE.LineSegments>(null); 
   const { mouse, viewport } = useThree();
   
   const dummy = useMemo(() => new THREE.Object3D(), []); 
   
-  const actualMaxParticles = isMobile ? 420 : 720;
-  const actualMaxConnections = isMobile ? 3 : 6; 
+  const perfLow = isMobile || lowPower;
+  const actualMaxParticles = perfLow ? 320 : 720;
+  const actualMaxConnections = perfLow ? 3 : 6; 
 
   const particles = useMemo(() => { 
     const pos = new Float32Array(actualMaxParticles * 3); 
@@ -344,31 +345,43 @@ function Particles({ scrollProgress, isMobile }: { scrollProgress: any, isMobile
 
 export default function NeuralBackground({ scrollProgress }: { scrollProgress: any }) { 
   const [isMobile, setIsMobile] = useState(false);
+  const [lowPower, setLowPower] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    const computeLowPower = () => {
+      const ua = navigator.userAgent || '';
+      const isAndroid = /Android/i.test(ua);
+      const deviceMemory = (navigator as any).deviceMemory as number | undefined;
+      const cores = navigator.hardwareConcurrency;
+      const lowMem = typeof deviceMemory === 'number' && deviceMemory <= 4;
+      const lowCores = typeof cores === 'number' && cores <= 4;
+      return isAndroid && (lowMem || lowCores);
+    };
+
     checkMobile();
+    setLowPower(computeLowPower());
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   return ( 
     <div style={{ position: 'fixed', inset: 0, zIndex: -1, pointerEvents: 'none', background: BACKGROUND_COLOR }}> 
-      <Canvas camera={{ position: [0, 0, 15], fov: isMobile ? 65 : 50 }} dpr={[1, 2]}> 
+      <Canvas camera={{ position: [0, 0, 15], fov: isMobile ? 65 : 50 }} dpr={lowPower ? 1 : [1, 2]} gl={{ antialias: !lowPower, powerPreference: 'high-performance' }}> 
         <color attach="background" args={[BACKGROUND_COLOR]} /> 
         <ambientLight intensity={0.18} /> 
         <pointLight position={[15, 15, 15]} intensity={1.4} color={ELECTRIC_BLUE} /> 
-        <Particles scrollProgress={scrollProgress} isMobile={isMobile} /> 
+        <Particles scrollProgress={scrollProgress} isMobile={isMobile} lowPower={lowPower} /> 
         <EffectComposer enableNormalPass={false}> 
           <Bloom 
             luminanceThreshold={0.02} 
             luminanceSmoothing={0.92} 
-            intensity={isMobile ? 1.9 : 3.2} 
+            intensity={lowPower ? 1.6 : (isMobile ? 1.9 : 3.2)} 
             blendFunction={BlendFunction.ADD} 
           /> 
-          <Noise opacity={isMobile ? 0 : 0.03} />
+          <Noise opacity={(isMobile || lowPower) ? 0 : 0.03} />
           <ChromaticAberration 
-            opacity={isMobile ? 0 : 1}
+            opacity={(isMobile || lowPower) ? 0 : 1}
             offset={new THREE.Vector2(0.00065, 0.00065)} 
             radialModulation={false}
             modulationOffset={0}

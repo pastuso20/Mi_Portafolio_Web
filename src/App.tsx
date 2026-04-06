@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import NeuralBackground from './components/NeuralNetwork';
 import { motion, useScroll, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
@@ -7,27 +7,41 @@ const App: React.FC = () => {
   const { scrollYProgress } = useScroll();
   const [isMobile, setIsMobile] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const headerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const updateVh = () => {
-      const vh = window.innerHeight * 0.01;
+      const height = window.visualViewport?.height ?? window.innerHeight;
+      const vh = height * 0.01;
       document.documentElement.style.setProperty('--app-vh', `${vh}px`);
     };
 
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    const checkAndroid = () => setIsAndroid(/Android/i.test(navigator.userAgent || ''));
 
     const handleResize = () => {
       updateVh();
       checkMobile();
+      checkAndroid();
+      requestAnimationFrame(() => {
+        const h = headerRef.current?.getBoundingClientRect().height ?? 0;
+        setHeaderHeight(h);
+      });
     };
 
     handleResize();
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
+    window.visualViewport?.addEventListener('resize', handleResize);
+    window.visualViewport?.addEventListener('scroll', handleResize);
 
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleResize);
+      window.visualViewport?.removeEventListener('resize', handleResize);
+      window.visualViewport?.removeEventListener('scroll', handleResize);
     };
   }, []);
 
@@ -128,11 +142,13 @@ const App: React.FC = () => {
       }} />
 
       {/* Responsive Header */}
-      <header style={{ 
+      <header ref={headerRef} style={{ 
         position: 'fixed',
         top: 0,
         width: '100%',
         padding: isMobile ? '15px 20px' : '30px 100px',
+        paddingTop: isMobile ? 'calc(env(safe-area-inset-top, 0px) + 12px)' : '30px',
+        paddingBottom: isMobile ? '12px' : '30px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -287,8 +303,11 @@ const App: React.FC = () => {
       <section id="inicio" style={{ 
         height: 'calc(var(--app-vh, 1vh) * 100)', 
         display: 'flex', 
-        alignItems: 'center', 
-        padding: isMobile ? '0 20px' : '0 100px' 
+        alignItems: (isMobile && isAndroid) ? 'flex-start' : 'center', 
+        padding: isMobile ? '0 20px' : '0 100px',
+        paddingTop: (isMobile && isAndroid) ? `${Math.max(0, headerHeight) + 18}px` : (isMobile ? 'calc(env(safe-area-inset-top, 0px) + 86px)' : '0'),
+        paddingBottom: isMobile ? '36px' : '0',
+        boxSizing: 'border-box'
       }}>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -353,7 +372,9 @@ const App: React.FC = () => {
           />
 
           <h1 style={{ 
-            fontSize: isMobile ? 'clamp(2.35rem, 9.8vw, 3.05rem)' : 'clamp(3.8rem, 5.8vw, 6.2rem)', 
+            fontSize: isMobile
+              ? (isAndroid ? 'clamp(2.1rem, 9.2vw, 2.85rem)' : 'clamp(2.35rem, 9.8vw, 3.05rem)')
+              : 'clamp(3.8rem, 5.8vw, 6.2rem)', 
             margin: '0 0 14px', 
             color: 'white', 
             fontFamily: "'Playfair Display', serif",
@@ -365,7 +386,7 @@ const App: React.FC = () => {
           </h1>
           
           <p style={{ 
-            fontSize: isMobile ? '0.98rem' : '1.4rem', 
+            fontSize: isMobile ? (isAndroid ? '0.92rem' : '0.98rem') : '1.4rem', 
             color: colors.textMain, 
             fontWeight: 300,
             letterSpacing: '0.5px',
