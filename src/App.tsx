@@ -1,49 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import NeuralBackground from './components/NeuralNetwork';
 import { motion, useScroll, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
 const App: React.FC = () => {
   const { scrollYProgress } = useScroll();
-  const [isMobile, setIsMobile] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isAndroid, setIsAndroid] = useState(false);
-  const [headerHeight, setHeaderHeight] = useState(0);
-  const headerRef = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    const updateVh = () => {
-      const height = window.visualViewport?.height ?? window.innerHeight;
-      const vh = height * 0.01;
-      document.documentElement.style.setProperty('--app-vh', `${vh}px`);
-    };
-
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    const checkAndroid = () => setIsAndroid(/Android/i.test(navigator.userAgent || ''));
-
-    const handleResize = () => {
-      updateVh();
-      checkMobile();
-      checkAndroid();
-      requestAnimationFrame(() => {
-        const h = headerRef.current?.getBoundingClientRect().height ?? 0;
-        setHeaderHeight(h);
-      });
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('orientationchange', handleResize);
-    window.visualViewport?.addEventListener('resize', handleResize);
-    window.visualViewport?.addEventListener('scroll', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('orientationchange', handleResize);
-      window.visualViewport?.removeEventListener('resize', handleResize);
-      window.visualViewport?.removeEventListener('scroll', handleResize);
-    };
-  }, []);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
@@ -137,38 +99,42 @@ const App: React.FC = () => {
         position: 'fixed', 
         inset: 0, 
         zIndex: -1, 
-        background: isMobile ? 'linear-gradient(to bottom, rgba(5,5,5,0.7), transparent 30%, transparent 70%, rgba(5,5,5,0.7))' : 'none',
+        background: 'linear-gradient(to bottom, rgba(5,5,5,0.55), transparent 28%, transparent 72%, rgba(5,5,5,0.6))',
         pointerEvents: 'none'
       }} />
 
       {/* Responsive Header */}
-      <header ref={headerRef} style={{ 
+      <header style={{ 
         position: 'fixed',
         top: 0,
         width: '100%',
-        padding: isMobile ? '15px 20px' : '30px 100px',
-        paddingTop: isMobile ? 'calc(env(safe-area-inset-top, 0px) + 12px)' : '30px',
-        paddingBottom: isMobile ? '12px' : '30px',
+        padding: 'clamp(14px, 2.4vw, 28px) clamp(18px, 6vw, 100px)',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + clamp(12px, 2vw, 20px))',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         zIndex: 100,
         background: 'rgba(5, 5, 5, 0.5)',
         backdropFilter: 'blur(15px)',
-        borderBottom: isMobile ? '1px solid rgba(255,255,255,0.05)' : 'none'
+        borderBottom: '1px solid rgba(255,255,255,0.05)'
       }}>
-        <div style={{ 
+        <a href="#inicio" onClick={() => setMenuOpen(false)} style={{ 
           color: colors.electricBlue, 
-          fontSize: isMobile ? '0.7rem' : '1rem', 
+          fontSize: 'clamp(0.72rem, 1.6vw, 1rem)', 
           fontWeight: 700, 
           letterSpacing: '2px', 
           textTransform: 'uppercase',
           textShadow: `0 0 15px ${colors.accentBlue}`,
-          maxWidth: isMobile ? '180px' : 'none',
-          lineHeight: 1.2
+          maxWidth: '70vw',
+          lineHeight: 1.2,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          textDecoration: 'none',
+          cursor: 'pointer'
         }}>
-          {isMobile ? 'DAVID AITE' : 'DAVID FELIPE AITE TREJO'}
-        </div>
+          DAVID FELIPE AITE TREJO
+        </a>
 
         <button 
           onClick={() => setMenuOpen(!menuOpen)}
@@ -177,7 +143,7 @@ const App: React.FC = () => {
             border: `1px solid ${colors.accentBlue}`, 
             color: 'white', 
             cursor: 'pointer',
-            padding: isMobile ? '8px' : '10px',
+            padding: 'clamp(8px, 1.2vw, 10px)',
             borderRadius: '12px',
             display: 'flex',
             alignItems: 'center',
@@ -185,7 +151,7 @@ const App: React.FC = () => {
             backdropFilter: 'blur(14px)'
           }}
         >
-          {menuOpen ? <X size={isMobile ? 20 : 22} /> : <Menu size={isMobile ? 20 : 22} />}
+          {menuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </header>
 
@@ -201,7 +167,7 @@ const App: React.FC = () => {
               position: 'fixed',
               inset: 0,
               zIndex: 1000,
-              background: isMobile ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.55)',
+              background: 'rgba(0,0,0,0.55)',
               backdropFilter: 'blur(8px)'
             }}
           >
@@ -215,18 +181,18 @@ const App: React.FC = () => {
                 position: 'absolute',
                 top: 0,
                 right: 0,
-                width: isMobile ? '100%' : 'min(460px, 92vw)',
-                height: 'calc(var(--app-vh, 1vh) * 100)',
+                width: 'min(460px, 100vw)',
                 background: 'radial-gradient(circle at 30% 20%, rgba(0, 198, 255, 0.10), rgba(5, 5, 5, 0.98) 55%)',
-                borderLeft: isMobile ? 'none' : `1px solid ${colors.accentBlue}`,
+                borderLeft: `1px solid ${colors.accentBlue}`,
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'flex-start',
                 alignItems: 'stretch',
-                padding: '20px 22px 30px',
+                padding: 'calc(env(safe-area-inset-top, 0px) + 20px) 22px calc(env(safe-area-inset-bottom, 0px) + 30px)',
                 gap: '12px',
                 overflowY: 'auto'
               }}
+              className="fullVh"
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 2px 14px' }}>
                 <div style={{ 
@@ -300,20 +266,21 @@ const App: React.FC = () => {
       </AnimatePresence>
 
       {/* Hero Section */}
-      <section id="inicio" style={{ 
-        height: 'calc(var(--app-vh, 1vh) * 100)', 
-        display: 'flex', 
-        alignItems: (isMobile && isAndroid) ? 'flex-start' : 'center', 
-        padding: isMobile ? '0 20px' : '0 100px',
-        paddingTop: (isMobile && isAndroid) ? `${Math.max(0, headerHeight) + 18}px` : (isMobile ? 'calc(env(safe-area-inset-top, 0px) + 86px)' : '0'),
-        paddingBottom: isMobile ? '36px' : '0',
-        boxSizing: 'border-box'
-      }}>
+      <section
+        id="inicio"
+        className="fullVh"
+        style={{ 
+          display: 'flex', 
+          alignItems: 'flex-start', 
+          padding: `calc(env(safe-area-inset-top, 0px) + clamp(100px, 14vh, 170px)) clamp(18px, 6vw, 100px) calc(env(safe-area-inset-bottom, 0px) + 36px)`,
+          boxSizing: 'border-box'
+        }}
+      >
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
-          style={{ width: '100%', maxWidth: isMobile ? '620px' : '860px' }}
+          style={{ width: '100%', maxWidth: '860px' }}
         >
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -323,8 +290,8 @@ const App: React.FC = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '10px',
-              marginBottom: isMobile ? '16px' : '22px',
-              padding: isMobile ? '8px 12px' : '10px 16px',
+              marginBottom: 'clamp(14px, 2.2vw, 22px)',
+              padding: 'clamp(8px, 1.6vw, 10px) clamp(12px, 2.2vw, 16px)',
               border: `1px solid ${colors.accentBlue}`,
               borderRadius: '999px',
               background: 'rgba(255,255,255,0.03)',
@@ -342,8 +309,8 @@ const App: React.FC = () => {
             }} />
             <span style={{ 
               color: colors.textMain, 
-              fontSize: isMobile ? '0.66rem' : '0.74rem', 
-              letterSpacing: isMobile ? '2px' : '2.5px', 
+              fontSize: 'clamp(0.66rem, 1.4vw, 0.74rem)', 
+              letterSpacing: 'clamp(2px, 0.3vw, 2.5px)', 
               textTransform: 'uppercase',
               opacity: 0.9,
               lineHeight: 1.2
@@ -362,37 +329,35 @@ const App: React.FC = () => {
             transition={{ duration: 1.1, ease: "easeOut", delay: 0.05 }}
             style={{
               height: '2px',
-              width: isMobile ? '140px' : '200px',
+              width: 'clamp(140px, 18vw, 200px)',
               transformOrigin: 'left',
               background: `linear-gradient(90deg, ${colors.electricBlue}, transparent)`,
               boxShadow: `0 0 22px ${colors.electricBlue}`,
               opacity: 0.85,
-              marginBottom: isMobile ? '18px' : '26px'
+              marginBottom: 'clamp(18px, 2.8vw, 26px)'
             }}
           />
 
           <h1 style={{ 
-            fontSize: isMobile
-              ? (isAndroid ? 'clamp(2.1rem, 9.2vw, 2.85rem)' : 'clamp(2.35rem, 9.8vw, 3.05rem)')
-              : 'clamp(3.8rem, 5.8vw, 6.2rem)', 
+            fontSize: 'clamp(2.35rem, 8.8vw, 6.2rem)', 
             margin: '0 0 14px', 
             color: 'white', 
             fontFamily: "'Playfair Display', serif",
             lineHeight: 1.06,
             fontWeight: 700,
-            letterSpacing: isMobile ? '-1px' : '-2px'
+            letterSpacing: 'clamp(-2px, -0.18vw, -1px)'
           }}>
             David Felipe<br/>Aite Trejo
           </h1>
           
           <p style={{ 
-            fontSize: isMobile ? (isAndroid ? '0.92rem' : '0.98rem') : '1.4rem', 
+            fontSize: 'clamp(0.92rem, 2.4vw, 1.4rem)', 
             color: colors.textMain, 
             fontWeight: 300,
             letterSpacing: '0.5px',
-            lineHeight: isMobile ? 1.55 : 1.5,
-            marginBottom: isMobile ? '22px' : '28px',
-            maxWidth: isMobile ? '100%' : '650px',
+            lineHeight: 1.55,
+            marginBottom: 'clamp(22px, 3vw, 28px)',
+            maxWidth: '650px',
             opacity: 0.8
           }}>
             Transformando visión en realidad técnica con diseño de alto impacto y arquitectura de software de elite.
@@ -405,9 +370,9 @@ const App: React.FC = () => {
             style={{
               display: 'flex',
               flexWrap: 'wrap',
-              gap: isMobile ? '10px' : '12px',
-              maxWidth: isMobile ? '100%' : '720px',
-              marginBottom: isMobile ? '26px' : '44px'
+              gap: 'clamp(10px, 1.8vw, 12px)',
+              maxWidth: '720px',
+              marginBottom: 'clamp(26px, 4vw, 44px)'
             }}
           >
             {[
@@ -418,7 +383,7 @@ const App: React.FC = () => {
               <div
                 key={item.label}
                 style={{
-                  padding: isMobile ? '10px 12px' : '12px 14px',
+                  padding: 'clamp(10px, 1.6vw, 12px) clamp(12px, 2vw, 14px)',
                   borderRadius: '999px',
                   border: `1px solid ${colors.accentBlue}`,
                   background: 'rgba(255,255,255,0.02)',
@@ -437,7 +402,7 @@ const App: React.FC = () => {
                 </div>
                 <div style={{ 
                   color: 'white', 
-                  fontSize: isMobile ? '0.95rem' : '1.02rem',
+                  fontSize: 'clamp(0.95rem, 2vw, 1.02rem)',
                   fontWeight: 500,
                   letterSpacing: '0.3px'
                 }}>
@@ -453,11 +418,11 @@ const App: React.FC = () => {
             whileTap={{ scale: 0.95 }}
             style={{
               display: 'inline-block',
-              padding: isMobile ? '14px 30px' : '20px 50px',
+              padding: 'clamp(14px, 2vw, 20px) clamp(30px, 6vw, 50px)',
               border: `1px solid white`,
               color: 'white',
               textDecoration: 'none',
-              fontSize: isMobile ? '0.75rem' : '0.9rem',
+              fontSize: 'clamp(0.75rem, 1.4vw, 0.9rem)',
               letterSpacing: '3px',
               textTransform: 'uppercase',
               background: 'rgba(255,255,255,0.03)',
@@ -473,50 +438,50 @@ const App: React.FC = () => {
 
       {/* About Section */}
       <section id="sobre-mí" style={{ 
-        padding: isMobile ? '40px 25px' : '150px 100px', 
+        padding: 'clamp(56px, 10vw, 150px) clamp(20px, 6vw, 100px)', 
         display: 'grid', 
-        gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
-        gap: isMobile ? '30px' : '120px', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(420px, 100%), 1fr))', 
+        gap: 'clamp(24px, 6vw, 120px)', 
         alignItems: 'center' 
       }}>
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1 }}
-          style={{ position: 'relative', maxWidth: isMobile ? '220px' : 'none', margin: isMobile ? '0 auto 20px' : '0 auto' }}
+          style={{ position: 'relative', maxWidth: 'min(260px, 70vw)', margin: '0 auto' }}
         >
           <div style={{ 
             width: '100%', 
             aspectRatio: '1', 
             background: `linear-gradient(135deg, ${colors.bg}, ${colors.deepBlue})`,
             borderRadius: '50%',
-            padding: isMobile ? '6px' : '12px',
+            padding: 'clamp(6px, 1.2vw, 12px)',
             border: `1px solid ${colors.accentBlue}`,
             overflow: 'hidden',
-            boxShadow: isMobile ? `0 0 30px ${colors.accentBlue}` : 'none'
+            boxShadow: `0 0 30px ${colors.accentBlue}`
           }}>
             <img src="/portada.jpeg" alt="David Felipe Aite Trejo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', filter: 'grayscale(20%) brightness(0.9)' }} />
           </div>
           <div style={{ 
             position: 'absolute', 
-            bottom: isMobile ? '-5px' : '30px', 
-            right: isMobile ? '-5px' : '30px', 
+            bottom: 'clamp(-6px, -0.6vw, 30px)', 
+            right: 'clamp(-6px, -0.6vw, 30px)', 
             background: 'rgba(5, 5, 5, 0.9)', 
-            padding: isMobile ? '12px 20px' : '35px', 
+            padding: 'clamp(12px, 2.4vw, 35px)', 
             border: `1px solid ${colors.accentBlue}`,
-            borderRadius: isMobile ? '15px' : '20px',
+            borderRadius: 'clamp(15px, 2vw, 20px)',
             backdropFilter: 'blur(15px)',
             zIndex: 2
           }}>
-            <h3 style={{ color: colors.electricBlue, fontSize: isMobile ? '1.2rem' : '3rem', margin: 0, fontWeight: 700 }}>5+</h3>
-            <p style={{ color: colors.textSec, fontSize: isMobile ? '0.5rem' : '0.7rem', margin: 0, textTransform: 'uppercase', letterSpacing: '2px' }}>Años de Pasión</p>
+            <h3 style={{ color: colors.electricBlue, fontSize: 'clamp(1.2rem, 3.2vw, 3rem)', margin: 0, fontWeight: 700 }}>5+</h3>
+            <p style={{ color: colors.textSec, fontSize: 'clamp(0.5rem, 1vw, 0.7rem)', margin: 0, textTransform: 'uppercase', letterSpacing: '2px' }}>Años de Pasión</p>
           </div>
         </motion.div>
 
         <div>
-          <span style={{ color: colors.electricBlue, letterSpacing: '5px', textTransform: 'uppercase', fontSize: isMobile ? '0.7rem' : '0.8rem', fontWeight: 600, display: 'block', marginBottom: '10px' }}>Perfil Profesional</span>
-          <h2 style={{ color: 'white', fontSize: isMobile ? '2rem' : '4.5rem', margin: '0 0 15px', fontFamily: "'Playfair Display', serif", fontWeight: 700 }}>¿Quién soy?</h2>
-          <p style={{ color: colors.textSec, fontSize: isMobile ? '0.9rem' : '1.2rem', lineHeight: 1.6, marginBottom: '20px', fontWeight: 300 }}>
+          <span style={{ color: colors.electricBlue, letterSpacing: '5px', textTransform: 'uppercase', fontSize: 'clamp(0.7rem, 1.4vw, 0.8rem)', fontWeight: 600, display: 'block', marginBottom: '10px' }}>Perfil Profesional</span>
+          <h2 style={{ color: 'white', fontSize: 'clamp(2rem, 6vw, 4.5rem)', margin: '0 0 15px', fontFamily: "'Playfair Display', serif", fontWeight: 700 }}>¿Quién soy?</h2>
+          <p style={{ color: colors.textSec, fontSize: 'clamp(0.9rem, 2.2vw, 1.2rem)', lineHeight: 1.6, marginBottom: '20px', fontWeight: 300 }}>
             Soy un profesional altamente motivado y con una sólida formación técnica, comprometido con la excelencia en el diseño, desarrollo y gestión de soluciones tecnológicas.
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '15px' }}>
@@ -535,22 +500,22 @@ const App: React.FC = () => {
       </section>
 
       {/* Skills Section */}
-      <section id="habilidades" style={{ padding: isMobile ? '40px 25px' : '150px 100px' }}>
-        <div style={{ textAlign: 'center', marginBottom: isMobile ? '30px' : '100px' }}>
-          <span style={{ color: colors.electricBlue, letterSpacing: '5px', textTransform: 'uppercase', fontSize: isMobile ? '0.7rem' : '0.8rem', fontWeight: 600 }}>Especialidades</span>
-          <h2 style={{ color: 'white', fontSize: isMobile ? '2rem' : '4rem', marginTop: '10px', fontFamily: "'Playfair Display', serif", fontWeight: 700 }}>Competencias Técnicas</h2>
+      <section id="habilidades" style={{ padding: 'clamp(56px, 10vw, 150px) clamp(20px, 6vw, 100px)' }}>
+        <div style={{ textAlign: 'center', marginBottom: 'clamp(30px, 7vw, 100px)' }}>
+          <span style={{ color: colors.electricBlue, letterSpacing: '5px', textTransform: 'uppercase', fontSize: 'clamp(0.7rem, 1.4vw, 0.8rem)', fontWeight: 600 }}>Especialidades</span>
+          <h2 style={{ color: 'white', fontSize: 'clamp(2rem, 6vw, 4rem)', marginTop: '10px', fontFamily: "'Playfair Display', serif", fontWeight: 700 }}>Competencias Técnicas</h2>
         </div>
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', 
-          gap: isMobile ? '30px' : '80px', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(520px, 100%), 1fr))', 
+          gap: 'clamp(24px, 6vw, 80px)', 
           maxWidth: '1100px', 
           margin: '0 auto' 
         }}>
           {skills.map(skill => (
             <div key={skill.name}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                <span style={{ color: 'white', fontWeight: 500, letterSpacing: '1px', fontSize: isMobile ? '0.85rem' : '1rem' }}>{skill.name}</span>
+                <span style={{ color: 'white', fontWeight: 500, letterSpacing: '1px', fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}>{skill.name}</span>
                 <span style={{ color: colors.electricBlue, fontWeight: 600 }}>{skill.level}%</span>
               </div>
               <div style={{ height: '2px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
@@ -567,10 +532,10 @@ const App: React.FC = () => {
       </section>
 
       {/* Experience Section - Card Deck Accordion */}
-      <section id="experiencia" style={{ padding: isMobile ? '40px 25px' : '150px 100px' }}>
-        <div style={{ textAlign: 'center', marginBottom: isMobile ? '30px' : '100px' }}>
-          <span style={{ color: colors.electricBlue, letterSpacing: '5px', textTransform: 'uppercase', fontSize: isMobile ? '0.7rem' : '0.8rem', fontWeight: 600 }}>Trayectoria Profesional</span>
-          <h2 style={{ color: 'white', fontSize: isMobile ? '2rem' : '4rem', marginTop: '10px', fontFamily: "'Playfair Display', serif", fontWeight: 700 }}>Experiencia Laboral</h2>
+      <section id="experiencia" style={{ padding: 'clamp(56px, 10vw, 150px) clamp(20px, 6vw, 100px)' }}>
+        <div style={{ textAlign: 'center', marginBottom: 'clamp(30px, 7vw, 100px)' }}>
+          <span style={{ color: colors.electricBlue, letterSpacing: '5px', textTransform: 'uppercase', fontSize: 'clamp(0.7rem, 1.4vw, 0.8rem)', fontWeight: 600 }}>Trayectoria Profesional</span>
+          <h2 style={{ color: 'white', fontSize: 'clamp(2rem, 6vw, 4rem)', marginTop: '10px', fontFamily: "'Playfair Display', serif", fontWeight: 700 }}>Experiencia Laboral</h2>
         </div>
 
         <div style={{ 
@@ -580,12 +545,12 @@ const App: React.FC = () => {
           maxWidth: '800px',
           margin: '0 auto',
           position: 'relative',
-          padding: isMobile ? '20px 0' : '100px 0'
+          padding: 'clamp(20px, 6vw, 100px) 0'
         }}>
           {experience.map((exp, idx) => (
             <motion.div
               key={idx}
-              initial={isMobile ? { y: 0, rotate: 0 } : { y: idx * 20, rotate: idx % 2 === 0 ? 1 : -1 }}
+              initial={{ y: idx * 20, rotate: idx % 2 === 0 ? 1 : -1 }}
               whileHover={{ 
                 y: -50,
                 rotate: 0,
@@ -598,18 +563,18 @@ const App: React.FC = () => {
                 background: 'rgba(255, 255, 255, 0.03)',
                 border: `1px solid ${colors.accentBlue}`,
                 borderRadius: '16px',
-                padding: isMobile ? '20px' : '40px',
+                padding: 'clamp(18px, 3vw, 40px)',
                 backdropFilter: 'blur(20px)',
                 cursor: 'pointer',
-                marginTop: isMobile ? '16px' : (idx === 0 ? 0 : '-100px'),
+                marginTop: idx === 0 ? 0 : 'calc(-1 * min(90px, 9vh))',
                 boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
                 position: 'relative',
-                zIndex: isMobile ? 1 : idx
+                zIndex: idx
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
                 <div>
-                  <h3 style={{ color: 'white', fontSize: isMobile ? '1.1rem' : '1.6rem', margin: 0, fontFamily: "'Playfair Display', serif" }}>{exp.role}</h3>
+                  <h3 style={{ color: 'white', fontSize: 'clamp(1.05rem, 2.6vw, 1.6rem)', margin: 0, fontFamily: "'Playfair Display', serif" }}>{exp.role}</h3>
                   <p style={{ color: colors.electricBlue, fontSize: '0.85rem', fontWeight: 600, marginTop: '8px', letterSpacing: '1px' }}>{exp.company}</p>
                 </div>
                 <span style={{ 
@@ -621,18 +586,18 @@ const App: React.FC = () => {
                   background: 'rgba(0, 198, 255, 0.05)'
                 }}>{exp.period}</span>
               </div>
-              <p style={{ color: colors.textSec, fontSize: isMobile ? '0.9rem' : '1.1rem', lineHeight: 1.7, margin: 0, fontWeight: 300 }}>{exp.desc}</p>
+              <p style={{ color: colors.textSec, fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)', lineHeight: 1.7, margin: 0, fontWeight: 300 }}>{exp.desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* Education Section */}
-      <section id="educación" style={{ padding: isMobile ? '40px 25px' : '150px 100px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.5fr', gap: isMobile ? '30px' : '120px' }}>
+      <section id="educación" style={{ padding: 'clamp(56px, 10vw, 150px) clamp(20px, 6vw, 100px)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(460px, 100%), 1fr))', gap: 'clamp(24px, 6vw, 120px)' }}>
           <div>
-            <span style={{ color: colors.electricBlue, letterSpacing: '5px', textTransform: 'uppercase', fontSize: isMobile ? '0.7rem' : '0.8rem', fontWeight: 600 }}>Trayectoria</span>
-            <h2 style={{ color: 'white', fontSize: isMobile ? '2rem' : '4rem', marginTop: '10px', fontFamily: "'Playfair Display', serif", fontWeight: 700 }}>Formación Académica</h2>
+            <span style={{ color: colors.electricBlue, letterSpacing: '5px', textTransform: 'uppercase', fontSize: 'clamp(0.7rem, 1.4vw, 0.8rem)', fontWeight: 600 }}>Trayectoria</span>
+            <h2 style={{ color: 'white', fontSize: 'clamp(2rem, 6vw, 4rem)', marginTop: '10px', fontFamily: "'Playfair Display', serif", fontWeight: 700 }}>Formación Académica</h2>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             {education.map((edu, idx) => (
@@ -642,15 +607,15 @@ const App: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.2 }}
                 style={{ 
-                  padding: isMobile ? '20px' : '50px', 
+                  padding: 'clamp(20px, 4vw, 50px)', 
                   background: 'rgba(255,255,255,0.02)', 
                   borderLeft: `2px solid ${colors.electricBlue}`,
                   backdropFilter: 'blur(10px)'
                 }}
               >
-                <h4 style={{ color: 'white', fontSize: isMobile ? '1rem' : '1.6rem', margin: '0 0 8px', fontWeight: 600 }}>{edu.title}</h4>
+                <h4 style={{ color: 'white', fontSize: 'clamp(1rem, 2.6vw, 1.6rem)', margin: '0 0 8px', fontWeight: 600 }}>{edu.title}</h4>
                 <p style={{ color: colors.electricBlue, fontSize: '0.7rem', margin: '0 0 12px', letterSpacing: '2px', fontWeight: 500 }}>{edu.period}</p>
-                <p style={{ color: colors.textSec, margin: 0, lineHeight: 1.6, fontSize: isMobile ? '0.85rem' : '1.1rem', fontWeight: 300 }}>{edu.desc}</p>
+                <p style={{ color: colors.textSec, margin: 0, lineHeight: 1.6, fontSize: 'clamp(0.85rem, 2.2vw, 1.1rem)', fontWeight: 300 }}>{edu.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -658,26 +623,26 @@ const App: React.FC = () => {
       </section>
 
       {/* Contact Section */}
-      <section id="contacto" style={{ padding: isMobile ? '60px 25px' : '200px 100px', textAlign: 'center' }}>
+      <section id="contacto" style={{ padding: 'clamp(60px, 12vw, 200px) clamp(20px, 6vw, 100px)', textAlign: 'center' }}>
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           style={{ 
             maxWidth: '900px', 
             margin: '0 auto', 
-            padding: isMobile ? '40px 20px' : '100px 50px', 
+            padding: 'clamp(40px, 8vw, 100px) clamp(20px, 4vw, 50px)', 
             background: 'rgba(255,255,255,0.01)', 
             border: `1px solid ${colors.accentBlue}`, 
-            borderRadius: isMobile ? '20px' : '30px',
+            borderRadius: 'clamp(20px, 3vw, 30px)',
             backdropFilter: 'blur(20px)'
           }}
         >
-          <h2 style={{ color: 'white', fontSize: isMobile ? '2rem' : '4.5rem', marginBottom: '15px', fontFamily: "'Playfair Display', serif", fontWeight: 700 }}>¿Hablamos?</h2>
+          <h2 style={{ color: 'white', fontSize: 'clamp(2rem, 6vw, 4.5rem)', marginBottom: '15px', fontFamily: "'Playfair Display', serif", fontWeight: 700 }}>¿Hablamos?</h2>
           <div style={{ 
             display: 'flex', 
-            flexDirection: isMobile ? 'column' : 'row', 
+            flexWrap: 'wrap', 
             justifyContent: 'center', 
-            gap: isMobile ? '15px' : '60px',
+            gap: 'clamp(15px, 4vw, 60px)',
             marginTop: '30px'
           }}>
             {['EMAIL', 'LINKEDIN', 'GITHUB'].map(link => (
@@ -686,7 +651,7 @@ const App: React.FC = () => {
                 textDecoration: 'none', 
                 fontWeight: 600, 
                 letterSpacing: '4px',
-                fontSize: isMobile ? '0.8rem' : '0.9rem'
+                fontSize: 'clamp(0.8rem, 1.6vw, 0.9rem)'
               }}>{link}</a>
             ))}
           </div>
@@ -707,8 +672,11 @@ const App: React.FC = () => {
       <style>{`
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        :root { --app-vh: 1vh; }
         html, body, #root { height: 100%; }
+        .fullVh { height: 100vh; }
+        @supports (height: 100svh) { .fullVh { height: 100svh; } }
+        @supports (height: 100dvh) { .fullVh { height: 100dvh; } }
+        section { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 110px); }
         body {
           margin: 0;
           padding: 0;

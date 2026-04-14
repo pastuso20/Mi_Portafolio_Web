@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "node --input-type=module -e \"import { execSync } from 'node:child_process'; execSync('tsc', { stdio: 'inherit' }); execSync('vite build', { stdio: 'inherit' });\"",
     "preview": "vite preview"
   },
   "dependencies": {
